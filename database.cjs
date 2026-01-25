@@ -3,26 +3,32 @@ const { open } = require('sqlite');
 const path = require('path');
 const fs = require('fs-extra');
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
+const dbDir = path.resolve(__dirname, 'data');
+const dbPath = path.join(dbDir, 'database.sqlite');
 
 let db;
 
 async function initDatabase() {
-    // Ensure database file exists
-    if (!fs.existsSync(dbPath)) {
-        fs.writeFileSync(dbPath, '');
-        console.log('Created new database file at', dbPath);
-    }
+  // Ensure database directory exists
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
 
-    db = await open({
-        filename: dbPath,
-        driver: sqlite3.Database
-    });
+  // Ensure database file exists
+  if (!fs.existsSync(dbPath)) {
+    fs.writeFileSync(dbPath, '');
+    console.log('Created new database file at', dbPath);
+  }
 
-    console.log('Connected to SQLite database.');
+  db = await open({
+    filename: dbPath,
+    driver: sqlite3.Database
+  });
 
-    // Create Users Table
-    await db.exec(`
+  console.log('Connected to SQLite database.');
+
+  // Create Users Table
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
@@ -33,8 +39,8 @@ async function initDatabase() {
     );
   `);
 
-    // Create Verification Codes Table (For WhatsApp/Telegram)
-    await db.exec(`
+  // Create Verification Codes Table (For WhatsApp/Telegram)
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS verification_codes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       phone TEXT,
@@ -45,8 +51,8 @@ async function initDatabase() {
     );
   `);
 
-    // Create Chat Messages Table (Persistent History)
-    await db.exec(`
+  // Create Chat Messages Table (Persistent History)
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
@@ -57,15 +63,15 @@ async function initDatabase() {
     );
   `);
 
-    console.log('Database tables verified.');
-    return db;
+  console.log('Database tables verified.');
+  return db;
 }
 
 function getDb() {
-    if (!db) {
-        throw new Error('Database not initialized. Call initDatabase() first.');
-    }
-    return db;
+  if (!db) {
+    throw new Error('Database not initialized. Call initDatabase() first.');
+  }
+  return db;
 }
 
 module.exports = { initDatabase, getDb };
