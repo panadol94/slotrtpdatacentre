@@ -19,7 +19,7 @@ export const Admin: React.FC = () => {
     const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     // APIs
-    const API_URL = 'http://localhost:3001/api';
+    const API_URL = '/api';
 
     useEffect(() => {
         if (isAuthenticated) {
