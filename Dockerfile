@@ -32,6 +32,7 @@ COPY --from=build-stage /app/dist ./dist
 # Copy backend source
 COPY server.cjs .
 COPY database.cjs .
+COPY .env .
 # Copy public folder structure if needed (though it might be empty initially)
 COPY public ./public
 
