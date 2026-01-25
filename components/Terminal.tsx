@@ -43,7 +43,7 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, isActive }) => {
         ) : (
           <div className="space-y-1.5">
             {logs.map((log) => (
-              <div key={log.id} className="flex gap-3 animate-in fade-in slide-in-from-left-2 duration-300">
+              <div key={log.id} className="flex gap-3">
                 <span className="text-slate-400 shrink-0">[{log.timestamp}]</span>
                 <span className={`
                   ${log.type === 'success' ? 'text-green-600 font-medium' : ''}

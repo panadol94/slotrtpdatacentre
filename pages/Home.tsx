@@ -369,7 +369,7 @@ export const Home: React.FC = () => {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-screen pb-24 pt-20 md:pt-24">
+    <div ref={containerRef} className="relative min-h-screen pb-24 pt-20 md:pt-24 overflow-x-hidden">
 
       {/* Premium Background Layer */}
       <div className="fixed inset-0 -z-50 overflow-hidden bg-slate-900">
