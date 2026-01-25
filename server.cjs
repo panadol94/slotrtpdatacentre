@@ -86,6 +86,7 @@ waClient.on('ready', () => {
 
 waClient.on('message', async msg => {
     const body = msg.body.toLowerCase();
+    console.log(`[WA] Received message from ${msg.from}: ${body}`);
 
     if (body.includes('register') || body.includes('daftar')) {
         const chat = await msg.getChat();
