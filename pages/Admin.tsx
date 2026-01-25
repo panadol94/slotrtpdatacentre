@@ -2,7 +2,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Server, Layout, Folder, FileText, Image as ImageIcon, LogOut, Plus, Trash2, Save, Upload, Check, AlertCircle, X, Menu, ArrowLeft } from 'lucide-react';
 import Cropper from 'react-easy-crop';
-import { removeBackground } from '@imgly/background-removal';
+// import { removeBackground } from '@imgly/background-removal'; // Commented out to rule out WASM crash
+
+// Error Boundary for Debugging
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error: Error, errorInfo: any) {
+        console.error("Admin Crash:", error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="p-8 bg-red-50 text-red-900 h-screen overflow-auto">
+                    <h1 className="text-2xl font-bold mb-4">⚠️ Admin Panel Crashed</h1>
+                    <pre className="bg-white p-4 rounded border border-red-200 overflow-auto text-xs font-mono">
+                        {this.state.error?.toString()}
+                    </pre>
+                    <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        Reload Page
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 // New Modal Component for Image Editing
 interface ImageUploaderModalProps {
@@ -31,9 +64,10 @@ const ImageUploaderModal: React.FC<ImageUploaderModalProps> = ({ isOpen, onClose
         if (!imageSrc) return;
         setIsProcessing(true);
         try {
-            const blob = await removeBackground(imageSrc);
-            const url = URL.createObjectURL(blob);
-            setImageSrc(url);
+            // const blob = await removeBackground(imageSrc);
+            // const url = URL.createObjectURL(blob);
+            // setImageSrc(url);
+            alert("Background removal temporarily disabled for stability check.");
         } catch (error) {
             console.error(error);
             alert("Failed to remove background");
@@ -140,9 +174,9 @@ const ImageUploaderModal: React.FC<ImageUploaderModalProps> = ({ isOpen, onClose
         </div>
     );
 };
-// ... In Admin Component ...
 
-export const Admin: React.FC = () => {
+// Internal Content Component
+const AdminContent: React.FC = () => {
 
     // New State for Advanced Features
     const [viewMode, setViewMode] = useState<'list' | 'raw'>('list');
@@ -235,8 +269,6 @@ export const Admin: React.FC = () => {
         return match ? `/providers/${encodeURIComponent(selectedProvider)}/${match}?t=${refreshTrigger}` : null;
     };
 
-    // ... See replacement in actual tool call execution ...
-
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
 
@@ -270,9 +302,10 @@ export const Admin: React.FC = () => {
         try {
             const res = await fetch(`${API_URL}/providers`);
             const data = await res.json();
-            setProviders(data);
+            setProviders(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Failed to fetch providers", err);
+            setProviders([]);
         }
     };
 
@@ -296,12 +329,13 @@ export const Admin: React.FC = () => {
             const res = await fetch(`${API_URL}/images/${encodeURIComponent(providerName)}`);
             if (res.ok) {
                 const data = await res.json();
-                setGameImages(data);
+                setGameImages(Array.isArray(data) ? data : []);
             } else {
                 setGameImages([]);
             }
         } catch (err) {
             console.error(err);
+            setGameImages([]);
         }
     };
 
@@ -686,3 +720,10 @@ export const Admin: React.FC = () => {
         </div>
     );
 };
+
+// Export Wrapped with Error Boundary
+export const Admin = () => (
+    <ErrorBoundary>
+        <AdminContent />
+    </ErrorBoundary>
+);
