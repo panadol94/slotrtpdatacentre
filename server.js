@@ -3,21 +3,25 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs-extra');
 const multer = require('multer');
+// Load Env Vars
+require('dotenv').config();
+
 const { initDatabase, getDb } = require('./database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const { Telegraf } = require('telegraf');
 
 // ... (previous imports)
 
 // Telegram Bot Setup
-const TELEGRAM_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // TODO: Move to .env
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 // Only start bot if token is provided to avoid crashing in dev
 let bot;
-if (TELEGRAM_TOKEN !== 'YOUR_TELEGRAM_BOT_TOKEN') {
+if (TELEGRAM_TOKEN) {
     bot = new Telegraf(TELEGRAM_TOKEN);
 
     bot.start(async (ctx) => {

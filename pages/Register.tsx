@@ -65,7 +65,7 @@ export const Register: React.FC = () => {
                                 <button
                                     onClick={() => {
                                         setMethod('whatsapp');
-                                        window.open('https://wa.me/60123456789?text=Register', '_blank'); // TODO: Update Phone
+                                        window.open('https://wa.me/60135326433?text=Register', '_blank');
                                         setStep(2);
                                     }}
                                     className="flex items-center gap-4 p-4 border rounded-xl hover:bg-green-50 hover:border-green-500 transition-all group"
@@ -82,7 +82,7 @@ export const Register: React.FC = () => {
                                 <button
                                     onClick={() => {
                                         setMethod('telegram');
-                                        window.open('https://t.me/SlotRTPBot?start=Register', '_blank'); // TODO: Update Bot User
+                                        window.open('https://t.me/rptslotdatabot?start=Register', '_blank'); // TODO: Update Bot User
                                         setStep(2);
                                     }}
                                     className="flex items-center gap-4 p-4 border rounded-xl hover:bg-blue-50 hover:border-blue-500 transition-all group"
