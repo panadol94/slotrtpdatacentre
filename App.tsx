@@ -6,21 +6,23 @@ import { Trusted } from './pages/Trusted';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import { Admin } from './pages/Admin';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 
-const App: React.FC = () => {
+function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
         <Navigation />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/trusted" element={<Trusted />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/profile" element={<Profile />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/trusted" element={<Trusted />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
       </div>
     </Router>
   );

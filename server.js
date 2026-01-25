@@ -1,21 +1,165 @@
-
-import express from 'express';
-import cors from 'cors';
-import multer from 'multer';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// ESM fix for __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs-extra');
+const multer = require('multer');
+const { initDatabase, getDb } = require('./database');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3001;
+const { Telegraf } = require('telegraf');
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ... (previous imports)
+
+// Telegram Bot Setup
+const TELEGRAM_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // TODO: Move to .env
+// Only start bot if token is provided to avoid crashing in dev
+let bot;
+if (TELEGRAM_TOKEN !== 'YOUR_TELEGRAM_BOT_TOKEN') {
+    bot = new Telegraf(TELEGRAM_TOKEN);
+
+    bot.start(async (ctx) => {
+        const db = getDb();
+        // Generate 6-digit code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const phone = ctx.from.username || ctx.from.first_name; // Use username as identifier
+
+        // Save to DB (expires in 10 mins)
+        const expiresAt = new Date(Date.now() + 10 * 60000).toISOString();
+
+        await db.run(
+            `INSERT INTO verification_codes (platform, code, phone, expires_at) VALUES (?, ?, ?, ?)`,
+            ['telegram', code, phone, expiresAt]
+        );
+
+        ctx.reply(`Welcome to Slot RTP Data Centre! 🎰\n\nYour Verification Code is: *${code}*\n\nPlease enter this code on the website to complete your registration.`, { parse_mode: 'Markdown' });
+    });
+
+    bot.launch().then(() => console.log('Telegram Bot started'));
+
+    // Enable graceful stop
+    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGTERM', () => bot.stop('SIGTERM'));
+} else {
+    console.log('Telegram Token not set. Bot skipped.');
+}
+
+// WhatsApp Bot Setup
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+// Initialize WhatsApp Client with LocalAuth (Saves session)
+const waClient = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true
+    }
+});
+
+waClient.on('qr', (qr) => {
+    console.log('WhatsApp QR Code received. Scan it to login:');
+    qrcode.generate(qr, { small: true });
+});
+
+waClient.on('ready', () => {
+    console.log('WhatsApp Bot is ready!');
+});
+
+waClient.on('message', async msg => {
+    const body = msg.body.toLowerCase();
+
+    if (body.includes('register') || body.includes('daftar')) {
+        const chat = await msg.getChat();
+
+        // Anti-Ban Logic: Simulate reading & typing delay
+        chat.sendStateTyping();
+        const delay = Math.floor(Math.random() * (10000 - 5000 + 1) + 5000); // 5-10 seconds
+
+        setTimeout(async () => {
+            const db = getDb();
+            // Generate Code
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const phone = msg.from.split('@')[0]; // Extract phone number
+
+            // Save to Code DB
+            const expiresAt = new Date(Date.now() + 10 * 60000).toISOString();
+            await db.run(
+                `INSERT INTO verification_codes (platform, code, phone, expires_at) VALUES (?, ?, ?, ?)`,
+                ['whatsapp', code, phone, expiresAt]
+            );
+
+            // Auto-Save Contact (Simulation - effectively we just responded to them)
+
+            msg.reply(`Salam Boss! 👋\n\nTerima kasih kerana berminat dengan *Slot RTP Data Centre*.\n\nKod Daftar sah anda ialah: *${code}*\n\nSila masukkan kod ini di website segera. Kod tamat dalam 10 minit.`);
+            chat.clearState();
+        }, delay);
+    }
+});
+
+waClient.initialize();
+
+// Initialize Database
+initDatabase().catch(err => console.error('Failed to init DB:', err));
+
+// --- Auth Endpoints ---
+
+// Register User (Username + Password + Optional Code)
+app.post('/api/register', async (req, res) => {
+    const { username, password, code } = req.body;
+    const db = getDb();
+
+    try {
+        // 1. Verify Code if provided (Logic to come later with Bots)
+        // For now, allow direct registration or check a static code
+
+        // 2. Hash Password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // 3. Create User
+        const result = await db.run(
+            `INSERT INTO users (username, password_hash) VALUES (?, ?)`,
+            [username, hashedPassword]
+        );
+
+        res.status(201).json({ message: 'User created successfully', userId: result.lastID });
+    } catch (error) {
+        if (error.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Username already taken' });
+        }
+        console.error('Register error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    const db = getDb();
+
+    try {
+        const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const match = await bcrypt.compare(password, user.password_hash);
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Generate Token
+        const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Paths
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -27,29 +171,17 @@ fs.ensureDirSync(PROVIDERS_DIR);
 // Multer Storage Config
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const { provider, type } = req.body;
-        // req.body might not be populated yet if fields come after file in FormData
-        // But multer processes fields if put before files. 
-        // We'll rely on a dynamic path construction or save to temp and move.
-        // For simplicity, let's assume valid provider is passed in URL query or we handle logic in filename.
-
-        // Better approach: We will control destination inside the route handler using memory storage or custom logic
-        // But for simple file serving, let's use a standard path strategy.
-
-        // Actually, simpler: Let's accept 'provider' as a query param or part of url for destination
-        // But multer middleware runs before route handler.
-        // Let's use specific routes for specific uploads.
-        cb(null, PROVIDERS_DIR); // This is just a base, we will move it later or refine
+        cb(null, PROVIDERS_DIR); // Base path, refined later
     },
     filename: function (req, file, cb) {
         cb(null, 'temp-' + Date.now() + '-' + file.originalname);
     }
 });
 
-// We will use memory storage to have full control over where to write files
+// Memory storage for control
 const upload = multer({ storage: multer.memoryStorage() });
 
-// --- API ENDPOINTS ---
+// --- CMS API ENDPOINTS ---
 
 // 1. Get All Providers
 app.get('/api/providers', async (req, res) => {
@@ -184,17 +316,13 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 });
 
 // Serve Static files (Frontend Build)
-// In production, we expect a 'dist' folder to exist at the root
 const DIST_DIR = path.join(__dirname, 'dist');
 if (fs.existsSync(DIST_DIR)) {
     app.use(express.static(DIST_DIR));
 }
 
 // Serve uploaded files (Providers)
-// Make sure this is accessible
 app.use('/providers', express.static(PROVIDERS_DIR));
-
-// API Routes above...
 
 // ANY other route -> Serve React Index.html (SPA Fallback)
 app.use((req, res) => {
