@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const dbDir = path.resolve(__dirname, 'data');
-const dbPath = path.join(dbDir, 'database.sqlite');
+const dbPath = path.join(dbDir, 'game_data.sqlite');
 
 let db;
 
