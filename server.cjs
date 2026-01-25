@@ -307,6 +307,43 @@ app.post('/api/games/:provider', async (req, res) => {
     }
 });
 
+// 5.5 Rename File (Game Image)
+app.post('/api/rename-file', async (req, res) => {
+    try {
+        const { provider, oldName, newName } = req.body;
+        if (!provider || !oldName || !newName) return res.status(400).json({ error: 'Missing parameters' });
+
+        const dirPath = path.join(PROVIDERS_DIR, provider);
+        // Clean names to be safe but allow spaces
+        const cleanOld = oldName.endsWith('.png') ? oldName : `${oldName}.png`;
+        const cleanNew = newName.endsWith('.png') ? newName : `${newName}.png`;
+
+        const oldPath = path.join(dirPath, cleanOld);
+        const newPath = path.join(dirPath, cleanNew);
+
+        // Check if old file exists
+        if (!await fs.pathExists(oldPath)) {
+            // Try jpg if png not found
+            const oldPathJpg = oldPath.replace('.png', '.jpg');
+            if (await fs.pathExists(oldPathJpg)) {
+                await fs.move(oldPathJpg, newPath.replace('.png', '.jpg'));
+                return res.json({ success: true, message: 'Renamed JPG successfully' });
+            }
+            return res.status(404).json({ error: 'Original file not found' });
+        }
+
+        // Check if new file already exists
+        if (await fs.pathExists(newPath)) {
+            return res.status(400).json({ error: 'Target filename already exists' });
+        }
+
+        await fs.move(oldPath, newPath);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 6. Upload Image (Provider Logo or Game Image)
 app.post('/api/upload', upload.single('file'), async (req, res) => {
     try {
