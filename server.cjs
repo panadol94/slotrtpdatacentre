@@ -59,7 +59,8 @@ const waClient = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: true
+        headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined // Use env var in Docker
     }
 });
 
