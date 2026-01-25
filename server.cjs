@@ -58,8 +58,9 @@ const qrcode = require('qrcode-terminal');
 const waClient = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--no-gpu'],
         headless: true,
+        protocolTimeout: 300000, // 5 minutes to prevent Network.enable timeout
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined // Use env var in Docker
     }
 });
