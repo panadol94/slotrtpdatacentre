@@ -6,7 +6,7 @@ const multer = require('multer');
 // Load Env Vars
 require('dotenv').config();
 
-const { initDatabase, getDb } = require('./database');
+const { initDatabase, getDb } = require('./database.cjs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 

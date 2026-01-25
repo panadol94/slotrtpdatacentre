@@ -16,7 +16,8 @@ RUN npm install --omit=dev
 # Copy built frontend from Stage 1
 COPY --from=build-stage /app/dist ./dist
 # Copy backend source
-COPY server.js .
+COPY server.cjs .
+COPY database.cjs .
 # Copy public folder structure if needed (though it might be empty initially)
 COPY public ./public
 
@@ -27,4 +28,4 @@ ENV NODE_ENV=production
 # Expose the backend port
 EXPOSE 3001
 
-CMD ["node", "server.js"]
+CMD ["node", "server.cjs"]
