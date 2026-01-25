@@ -53,6 +53,11 @@ if (TELEGRAM_TOKEN) {
 // WhatsApp Bot Setup
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode'); // For frontend
+
+// WhatsApp State
+let waStatus = 'INITIALIZING'; // INITIALIZING, QR_READY, CONNECTED, DISCONNECTED
+let waQrCode = null; // Base64 Image Data URL
 
 // Initialize WhatsApp Client with LocalAuth (Saves session)
 const waClient = new Client({
@@ -74,14 +79,30 @@ const waClient = new Client({
     }
 });
 
-waClient.on('qr', (qr) => {
+waClient.on('qr', async (qr) => {
     console.log('WhatsApp QR Code received. Scan it to login:');
     qrcode.generate(qr, { small: true });
+
+    // Generate Base64 for Frontend
+    try {
+        waQrCode = await QRCode.toDataURL(qr);
+        waStatus = 'QR_READY';
+    } catch (err) {
+        console.error('Failed to generate QR image:', err);
+    }
+
     console.log('>> QR STRING (Copy this if image fails):', qr);
 });
 
 waClient.on('ready', () => {
     console.log('WhatsApp Bot is ready!');
+    waStatus = 'CONNECTED';
+    waQrCode = null;
+});
+
+waClient.on('disconnected', () => {
+    console.log('WhatsApp Bot disconnected!');
+    waStatus = 'DISCONNECTED';
 });
 
 waClient.on('message', async msg => {
@@ -122,6 +143,15 @@ waClient.initialize();
 initDatabase().catch(err => console.error('Failed to init DB:', err));
 
 // --- Auth Endpoints ---
+
+// Get WhatsApp Status
+app.get('/api/whatsapp/status', (req, res) => {
+    res.json({
+        status: waStatus,
+        qr: waQrCode
+    });
+});
+
 
 // Register User (Username + Password + Optional Code)
 app.post('/api/register', async (req, res) => {

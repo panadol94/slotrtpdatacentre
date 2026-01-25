@@ -426,28 +426,57 @@ export const Admin: React.FC = () => {
 
 
 
+    // ... Imports
+    const [waStatus, setWaStatus] = useState<{ status: string, qr: string | null }>({ status: 'LOADING', qr: null });
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            const interval = setInterval(fetchWaStatus, 5000); // Poll every 5s
+            fetchWaStatus();
+            return () => clearInterval(interval);
+        }
+    }, [isAuthenticated]);
+
+    const fetchWaStatus = async () => {
+        try {
+            const res = await fetch(`${API_URL}/whatsapp/status`);
+            const data = await res.json();
+            setWaStatus(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-
-
-
             {/* Main Content */}
             <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] md:h-screen">
                 <div className="p-4 md:p-8 max-w-7xl mx-auto">
-
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-                                {selectedProvider ? `Edit: ${selectedProvider}` : 'Control Center'}
-                            </h1>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+                                    {selectedProvider ? `Edit: ${selectedProvider}` : 'Control Center'}
+                                </h1>
+                                {!selectedProvider && (
+                                    <button
+                                        onClick={() => setIsAuthenticated(false)}
+                                        className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold flex items-center gap-1 transition"
+                                    >
+                                        <LogOut size={14} /> Logout
+                                    </button>
+                                )}
+                            </div>
+                            {/* WhatsApp Status Indicator */}
                             {!selectedProvider && (
-                                <button
-                                    onClick={() => setIsAuthenticated(false)}
-                                    className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold flex items-center gap-1 transition"
-                                >
-                                    <LogOut size={14} /> Logout
-                                </button>
+                                <div className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm w-fit">
+                                    <span className="font-bold text-slate-600">Bot Status:</span>
+                                    {waStatus.status === 'CONNECTED' && <span className="flex items-center gap-1 text-green-600 font-bold"><Check size={14} /> Active</span>}
+                                    {waStatus.status === 'QR_READY' && <span className="flex items-center gap-1 text-orange-600 font-bold"><AlertCircle size={14} /> Scan QR Below</span>}
+                                    {waStatus.status === 'INITIALIZING' && <span className="text-slate-400">Initializing...</span>}
+                                    {waStatus.status === 'DISCONNECTED' && <span className="text-red-500 font-bold">Disconnected</span>}
+                                </div>
                             )}
                         </div>
 
@@ -461,6 +490,24 @@ export const Admin: React.FC = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* WhatsApp QR Panel (Only if Scan Needed) */}
+                    {!selectedProvider && waStatus.status === 'QR_READY' && waStatus.qr && (
+                        <div className="mb-8 bg-orange-50 border border-orange-200 p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 animate-pulse-slow">
+                            <div className="bg-white p-2 rounded-lg shadow-md">
+                                <img src={waStatus.qr} alt="WhatsApp QR" className="w-48 h-48 md:w-64 md:h-64 object-contain" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-orange-800 mb-2">WhatsApp Session Disconnected</h3>
+                                <p className="text-orange-700 mb-4 max-w-lg">
+                                    The bot needs to be re-linked. Open WhatsApp on your phone, go to <b>Linked Devices</b>, and scan this QR code immediately.
+                                </p>
+                                <div className="text-sm text-slate-500">
+                                    Updates automatically when scanned.
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* VIEW: Provider List (Master) */}
                     {!selectedProvider && (
