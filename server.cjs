@@ -209,6 +209,26 @@ app.get('/api/providers', async (req, res) => {
     }
 });
 
+// 1.5 Get Provider Images
+app.get('/api/images/:provider', async (req, res) => {
+    try {
+        const { provider } = req.params;
+        const dirPath = path.join(PROVIDERS_DIR, provider);
+
+        if (!await fs.pathExists(dirPath)) {
+            return res.json([]);
+        }
+
+        const files = await fs.readdir(dirPath);
+        // Filter for images only (png, jpg, webp)
+        const images = files.filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f) && f !== 'logo.png');
+
+        res.json(images);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 2. Create Provider
 app.post('/api/providers', async (req, res) => {
     try {
