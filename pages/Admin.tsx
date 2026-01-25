@@ -1,6 +1,6 @@
 // Imports at top
 import React, { useState, useEffect, useRef } from 'react';
-import { Server, Layout, Folder, FileText, Image, LogOut, Plus, Trash2, Save, Upload, Check, AlertCircle, X, Menu, ArrowLeft } from 'lucide-react';
+import { Server, Layout, Folder, FileText, Image as ImageIcon, LogOut, Plus, Trash2, Save, Upload, Check, AlertCircle, X, Menu, ArrowLeft } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { removeBackground } from '@imgly/background-removal';
 
@@ -44,7 +44,7 @@ const ImageUploaderModal: React.FC<ImageUploaderModalProps> = ({ isOpen, onClose
     const createCroppedImage = async () => {
         if (!imageSrc || !croppedAreaPixels) return;
         try {
-            const image = new Image();
+            const image = new window.Image();
             image.src = imageSrc;
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -468,16 +468,14 @@ export const Admin: React.FC = () => {
                                     </button>
                                 )}
                             </div>
-                            {/* WhatsApp Status Indicator */}
-                            {!selectedProvider && (
-                                <div className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm w-fit">
-                                    <span className="font-bold text-slate-600">Bot Status:</span>
-                                    {waStatus.status === 'CONNECTED' && <span className="flex items-center gap-1 text-green-600 font-bold"><Check size={14} /> Active</span>}
-                                    {waStatus.status === 'QR_READY' && <span className="flex items-center gap-1 text-orange-600 font-bold"><AlertCircle size={14} /> Scan QR Below</span>}
-                                    {waStatus.status === 'INITIALIZING' && <span className="text-slate-400">Initializing...</span>}
-                                    {waStatus.status === 'DISCONNECTED' && <span className="text-red-500 font-bold">Disconnected</span>}
-                                </div>
-                            )}
+                            {/* WhatsApp Status Indicator (Always Visible) */}
+                            <div className="flex items-center gap-2 text-sm bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm w-fit">
+                                <span className="font-bold text-slate-600">Bot Status:</span>
+                                {waStatus.status === 'CONNECTED' && <span className="flex items-center gap-1 text-green-600 font-bold"><Check size={14} /> Active</span>}
+                                {waStatus.status === 'QR_READY' && <span className="flex items-center gap-1 text-orange-600 font-bold"><AlertCircle size={14} /> Scan QR Below</span>}
+                                {waStatus.status === 'INITIALIZING' && <span className="text-slate-400">Initializing...</span>}
+                                {waStatus.status === 'DISCONNECTED' && <span className="text-red-500 font-bold">Disconnected</span>}
+                            </div>
                         </div>
 
                         {statusMsg && (
@@ -491,8 +489,8 @@ export const Admin: React.FC = () => {
                         )}
                     </div>
 
-                    {/* WhatsApp QR Panel (Only if Scan Needed) */}
-                    {!selectedProvider && waStatus.status === 'QR_READY' && waStatus.qr && (
+                    {/* WhatsApp QR Panel (Visible when needed, regardless of page) */}
+                    {waStatus.status === 'QR_READY' && waStatus.qr && (
                         <div className="mb-8 bg-orange-50 border border-orange-200 p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 animate-pulse-slow">
                             <div className="bg-white p-2 rounded-lg shadow-md">
                                 <img src={waStatus.qr} alt="WhatsApp QR" className="w-48 h-48 md:w-64 md:h-64 object-contain" />
@@ -538,10 +536,10 @@ export const Admin: React.FC = () => {
                             {/* Providers List */}
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col max-h-[400px] lg:max-h-[calc(100vh-200px)] overflow-y-auto">
                                 <div className="p-3 border-b border-slate-100 bg-slate-50 font-bold text-slate-700 text-sm sticky top-0">
-                                    All Providers ({providers.length})
+                                    All Providers ({Array.isArray(providers) ? providers.length : 0})
                                 </div>
                                 <div className="p-2 space-y-1">
-                                    {providers.map(p => (
+                                    {Array.isArray(providers) && providers.map(p => (
                                         <button
                                             key={p.name}
                                             onClick={() => setSelectedProvider(p.name)}
@@ -552,7 +550,7 @@ export const Admin: React.FC = () => {
                                                     {p.hasLogo ? (
                                                         <img src={`/providers/${encodeURIComponent(p.name)}/logo.png?t=${refreshTrigger}`} alt="logo" className="w-full h-full object-contain p-0.5" />
                                                     ) : (
-                                                        <Image size={14} className="text-slate-400" />
+                                                        <ImageIcon size={14} className="text-slate-400" />
                                                     )}
                                                 </div>
                                                 <span className="truncate text-sm">{p.name}</span>
@@ -632,7 +630,7 @@ export const Admin: React.FC = () => {
                                             ))}
                                             {gameImages.length === 0 && (
                                                 <div className="col-span-full flex flex-col items-center justify-center text-slate-400 py-8 gap-2 border-2 border-dashed border-slate-100 rounded-xl">
-                                                    <Image size={32} className="opacity-20" />
+                                                    <ImageIcon size={32} className="opacity-20" />
                                                     <span className="text-sm">No images found for this provider</span>
                                                 </div>
                                             )}
@@ -688,5 +686,3 @@ export const Admin: React.FC = () => {
         </div>
     );
 };
-
-
