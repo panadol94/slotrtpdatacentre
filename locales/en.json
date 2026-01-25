@@ -1,0 +1,31 @@
+{
+    "nav": {
+        "home": "Home",
+        "trusted": "Trusted Company",
+        "chat": "Live Chat",
+        "profile": "Profile",
+        "install": "Install App"
+    },
+    "hero": {
+        "system_live": "SYSTEM LIVE",
+        "title": "AI Signal Scanner",
+        "subtitle": "Advanced algorithm analysis for real-time probability detection.",
+        "select_provider": "Target Provider",
+        "start_scan": "START NEW SCAN",
+        "scanning": "SCANNING...",
+        "maintenance": "SYSTEM MAINTENANCE",
+        "enter_id": "Enter {{provider}} ID",
+        "id_required": "⚠ User ID is required"
+    },
+    "results": {
+        "detected_signals": "Detected Signals",
+        "last_win": "Last Win",
+        "high_vol": "HIGH VOL",
+        "share": "Share",
+        "share_msg": "Result copied to clipboard!",
+        "copied": "Copied"
+    },
+    "footer": {
+        "copyright": "Copyright © 2026 Slot RTP Data Centre. All rights reserved."
+    }
+}

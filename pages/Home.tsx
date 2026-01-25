@@ -6,9 +6,12 @@ import { Wifi, Activity, Play, Filter, ChevronDown, X, Search, Check, Zap, Lock,
 import { PROVIDERS_LIST, PROVIDER_GAMES, DEFAULT_GAMES } from '../constants';
 import gsap from 'gsap';
 
+import { useTranslation } from 'react-i18next';
+
 const RESTRICTED_PROVIDERS = ["Mega888", "918Kiss", "Pussy888"];
 
 export const Home: React.FC = () => {
+  const { t } = useTranslation();
   const [isScanning, setIsScanning] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string>("");
   const [showProviderModal, setShowProviderModal] = useState(false);
@@ -422,10 +425,10 @@ export const Home: React.FC = () => {
 
             <div className="relative z-10 py-12 px-6">
               <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg select-none">
-                AI Signal Scanner
+                {t('hero.title')}
               </h1>
               <p className="text-white/90 text-lg mt-2 font-medium drop-shadow-md">
-                Advanced algorithm analysis for real-time probability detection.
+                {t('hero.subtitle')}
               </p>
             </div>
           </div>
@@ -433,7 +436,7 @@ export const Home: React.FC = () => {
           {/* Provider Selector Button */}
           <div className="hero-element max-w-xs mx-auto mb-6 relative z-20">
             <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-              <Filter size={12} /> Target Provider
+              <Filter size={12} /> {t('hero.select_provider')}
             </div>
             <button
               ref={providerButtonRef}
@@ -482,7 +485,7 @@ export const Home: React.FC = () => {
                   ) : <Zap size={14} fill="currentColor" />}
                 </div>
                 <span className="truncate max-w-[150px]">
-                  {selectedProvider || "Select Provider"}
+                  {selectedProvider || t('hero.select_provider')}
                 </span>
               </div>
               <ChevronDown size={18} className={`transition-colors ${!selectedProvider ? 'text-primary-400' : 'text-slate-400'} group-hover:text-primary-500`} />
@@ -508,7 +511,7 @@ export const Home: React.FC = () => {
                       setUserInputId(e.target.value);
                       setInputError(false);
                     }}
-                    placeholder={`Enter ${selectedProvider} ID`}
+                    placeholder={t('hero.enter_id', { provider: selectedProvider })}
                     disabled={isScanning}
                     className="w-full pl-11 pr-4 py-3 bg-transparent text-slate-800 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none text-center"
                   />
@@ -516,7 +519,7 @@ export const Home: React.FC = () => {
               </div>
               {inputError && (
                 <p className="text-red-500 text-xs font-bold mt-2 animate-pulse">
-                  ⚠ User ID is required
+                  {t('hero.id_required')}
                 </p>
               )}
             </div>
@@ -576,15 +579,15 @@ export const Home: React.FC = () => {
                 {isScanning ? (
                   <>
                     <Activity className="animate-spin" />
-                    <span className="tracking-wide">SCANNING... {Math.round(progress)}%</span>
+                    <span className="tracking-wide">{t('hero.scanning')} {Math.round(progress)}%</span>
                   </>
                 ) : isMaintenance ? (
                   <>
-                    <Lock size={18} /> SYSTEM MAINTENANCE
+                    <Lock size={18} /> {t('hero.maintenance')}
                   </>
                 ) : (
                   <>
-                    <Play fill="currentColor" className="animate-pulse" /> START NEW SCAN
+                    <Play fill="currentColor" className="animate-pulse" /> {t('hero.start_scan')}
                   </>
                 )}
               </div>
@@ -609,7 +612,7 @@ export const Home: React.FC = () => {
           <div ref={resultsRef} className="mt-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                <Wifi className="text-primary-500" /> Detected Signals ({results.length})
+                <Wifi className="text-primary-500" /> {t('results.detected_signals')} ({results.length})
               </h2>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded hidden sm:inline-block">ID: {Date.now().toString().slice(-6)}</span>
@@ -617,7 +620,7 @@ export const Home: React.FC = () => {
                   onClick={handleShare}
                   className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-indigo-700 transition-colors"
                 >
-                  <Share2 size={14} /> Share
+                  <Share2 size={14} /> {t('results.share')}
                 </button>
               </div>
             </div>
@@ -670,7 +673,7 @@ export const Home: React.FC = () => {
                         <span className="text-[10px] uppercase font-bold text-slate-600 bg-white/60 px-2 py-0.5 rounded-full border border-white/40 shadow-sm backdrop-blur-sm">{game.provider}</span>
                         {game.volatility === 'High' && (
                           <span className="text-[10px] text-white font-bold flex items-center gap-1 bg-red-500/80 px-2 py-0.5 rounded-full shadow-red-500/30 shadow-sm animate-pulse">
-                            <i className="w-1.5 h-1.5 rounded-full bg-white"></i> HIGH VOL
+                            <i className="w-1.5 h-1.5 rounded-full bg-white"></i> {t('results.high_vol')}
                           </span>
                         )}
                       </div>
@@ -680,7 +683,7 @@ export const Home: React.FC = () => {
                   {/* Right: Stats */}
                   <div className="text-right flex items-center gap-8 relative z-10">
                     <div className="hidden sm:block text-xs text-slate-500 font-medium text-right">
-                      <div className="flex items-center gap-1 justify-end opacity-70"><Clock size={12} /> Last Win</div>
+                      <div className="flex items-center gap-1 justify-end opacity-70"><Clock size={12} /> {t('results.last_win')}</div>
                       <div className="bg-white/40 px-2 py-0.5 rounded-md backdrop-blur-sm">{game.lastWin}</div>
                     </div>
 
@@ -716,7 +719,7 @@ export const Home: React.FC = () => {
 
             <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
               <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white z-10">
-                <h3 className="text-lg font-bold text-slate-800">Select Provider</h3>
+                <h3 className="text-lg font-bold text-slate-800">{t('hero.select_provider')}</h3>
                 <button onClick={() => setShowProviderModal(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
                   <X size={20} />
                 </button>

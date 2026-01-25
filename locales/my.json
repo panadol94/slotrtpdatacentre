@@ -1,0 +1,31 @@
+{
+    "nav": {
+        "home": "Utama",
+        "trusted": "Syarikat Dipercayai",
+        "chat": "Sembang Langsung",
+        "profile": "Profil",
+        "install": "Install App"
+    },
+    "hero": {
+        "system_live": "SISTEM ONLINE",
+        "title": "Pengimbas Signal AI",
+        "subtitle": "Analisis algoritma canggih untuk pengesanan kebarangkalian masa nyata.",
+        "select_provider": "Pilih Provider",
+        "start_scan": "MULAKAN SCAN",
+        "scanning": "SEDANG SCAN...",
+        "maintenance": "SISTEM PENYELENGGARAAN",
+        "enter_id": "Masukkan ID {{provider}}",
+        "id_required": "⚠ ID Pengguna diperlukan"
+    },
+    "results": {
+        "detected_signals": "Signal Dikesan",
+        "last_win": "Menang Terakhir",
+        "high_vol": "VOL TINGGI",
+        "share": "Kongsi",
+        "share_msg": "Keputusan disalin ke papan keratan!",
+        "copied": "Disalin"
+    },
+    "footer": {
+        "copyright": "Hak Cipta Terpelihara © 2026 Slot RTP Data Centre."
+    }
+}
