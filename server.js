@@ -197,7 +197,7 @@ app.use('/providers', express.static(PROVIDERS_DIR));
 // API Routes above...
 
 // ANY other route -> Serve React Index.html (SPA Fallback)
-app.get('*', (req, res) => {
+app.use((req, res) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'API endpoint not found' });
     }
