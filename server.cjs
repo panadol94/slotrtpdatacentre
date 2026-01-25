@@ -63,16 +63,14 @@ const waClient = new Client({
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
             '--no-gpu',
-            '--disable-accelerated-2d-canvas',
+            '--disable-gpu',
             '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu'
+            '--ignore-certificate-errors',
+            '--allow-running-insecure-content'
         ],
         headless: true,
-        protocolTimeout: 300000,
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        pipe: true
+        protocolTimeout: 500000,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
     }
 });
 
