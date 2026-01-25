@@ -324,7 +324,6 @@ if (fs.existsSync(DIST_DIR)) {
 // Serve uploaded files (Providers)
 app.use('/providers', express.static(PROVIDERS_DIR));
 
-// ANY other route -> Serve React Index.html (SPA Fallback)
 app.use((req, res) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'API endpoint not found' });
@@ -339,6 +338,69 @@ app.use((req, res) => {
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+// --- SOCKET.IO SETUP ---
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Allow all origins for simplicity in this hybrid app
+        methods: ["GET", "POST"]
+    }
+});
+
+// Socket Auth Middleware
+io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) return next(new Error('Authentication error'));
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) return next(new Error('Authentication error'));
+        socket.user = decoded;
+        next();
+    });
+});
+
+io.on('connection', async (socket) => {
+    console.log(`User Connected: ${socket.user.username}`);
+
+    // Send Online Count
+    io.emit('online_count', io.engine.clientsCount);
+
+    // Send Chat History (Last 50 messages)
+    const db = getDb();
+    const history = await db.all('SELECT * FROM messages ORDER BY created_at ASC LIMIT 50');
+    socket.emit('chat_history', history);
+
+    socket.on('message', async (content) => {
+        if (!content.trim()) return;
+
+        // Save to DB
+        const result = await db.run(
+            `INSERT INTO messages (user_id, username, content, type) VALUES (?, ?, ?, ?)`,
+            [socket.user.id, socket.user.username, content, 'text']
+        );
+
+        // Broadcast to all
+        const msg = {
+            id: result.lastID,
+            userId: socket.user.id,
+            username: socket.user.username,
+            content,
+            type: 'text',
+            created_at: new Date().toISOString()
+        };
+        io.emit('message', msg);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User Disconnected: ${socket.user.username}`);
+        io.emit('online_count', io.engine.clientsCount);
+    });
+});
+
+// Change app.listen to server.listen to support socket.io
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server (HTTP + Socket) running on http://0.0.0.0:${PORT}`);
 });
