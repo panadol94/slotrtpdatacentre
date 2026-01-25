@@ -77,6 +77,7 @@ const waClient = new Client({
 waClient.on('qr', (qr) => {
     console.log('WhatsApp QR Code received. Scan it to login:');
     qrcode.generate(qr, { small: true });
+    console.log('>> QR STRING (Copy this if image fails):', qr);
 });
 
 waClient.on('ready', () => {
