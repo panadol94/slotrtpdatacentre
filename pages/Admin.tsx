@@ -239,7 +239,6 @@ export const Admin: React.FC = () => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
-    const [activeTab, setActiveTab] = useState<'providers' | 'games'>('providers');
 
     // Data State
     const [providers, setProviders] = useState<{ name: string, hasLogo: boolean }[]>([]);
@@ -262,10 +261,10 @@ export const Admin: React.FC = () => {
     }, [isAuthenticated, refreshTrigger]);
 
     useEffect(() => {
-        if (isAuthenticated && selectedProvider && activeTab === 'games') {
+        if (isAuthenticated && selectedProvider) {
             fetchGames(selectedProvider);
         }
-    }, [selectedProvider, activeTab]);
+    }, [selectedProvider]);
 
     const fetchProviders = async () => {
         try {
@@ -396,8 +395,6 @@ export const Admin: React.FC = () => {
         }
     };
 
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
     // ... Views ...
 
     if (!isAuthenticated) {
@@ -427,69 +424,12 @@ export const Admin: React.FC = () => {
         );
     }
 
-    const SidebarContent = () => (
-        <>
-            <div className="p-6 border-b border-slate-700 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Server size={20} className="text-primary-400" /> Control Center
-                </h2>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white">
-                    <X size={24} />
-                </button>
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
-                <button
-                    onClick={() => { setActiveTab('providers'); setIsMobileMenuOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'providers' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
-                >
-                    <Folder size={18} /> Providers
-                </button>
-                <button
-                    onClick={() => { setActiveTab('games'); setIsMobileMenuOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'games' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
-                >
-                    <FileText size={18} /> Games & Images
-                </button>
-            </nav>
-            <div className="p-4 border-t border-slate-700">
-                <button
-                    onClick={() => setIsAuthenticated(false)}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition"
-                >
-                    <LogOut size={18} /> Logout
-                </button>
-            </div>
-        </>
-    );
+
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
 
-            {/* Mobile Header */}
-            <div className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-20 sticky top-0 shadow-md">
-                <h1 className="font-bold text-lg flex items-center gap-2">
-                    <Server size={18} className="text-primary-400" /> Admin
-                </h1>
-                <button onClick={() => setIsMobileMenuOpen(true)}>
-                    <Menu size={24} />
-                </button>
-            </div>
 
-            {/* Sidebar (Desktop + Mobile Drawer) */}
-            <div className={`
-                fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out md:relative md:translate-x-0
-                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
-                <SidebarContent />
-            </div>
-
-            {/* Mobile Overlay */}
-            {isMobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
-            )}
 
             {/* Main Content */}
             <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] md:h-screen">
@@ -497,9 +437,20 @@ export const Admin: React.FC = () => {
 
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-                            {activeTab === 'providers' ? 'Manage Providers' : 'Manage Games'}
-                        </h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+                                {selectedProvider ? `Edit: ${selectedProvider}` : 'Control Center'}
+                            </h1>
+                            {!selectedProvider && (
+                                <button
+                                    onClick={() => setIsAuthenticated(false)}
+                                    className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold flex items-center gap-1 transition"
+                                >
+                                    <LogOut size={14} /> Logout
+                                </button>
+                            )}
+                        </div>
+
                         {statusMsg && (
                             <div className={`w-full md:w-auto px-4 py-2 rounded-lg flex items-center justify-between gap-2 ${statusMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                 <div className="flex items-center gap-2">
@@ -511,8 +462,8 @@ export const Admin: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Providers Tab */}
-                    {activeTab === 'providers' && (
+                    {/* VIEW: Provider List (Master) */}
+                    {!selectedProvider && (
                         <div className="space-y-6">
                             {/* Create New */}
                             <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
@@ -538,7 +489,11 @@ export const Admin: React.FC = () => {
                             {/* List */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                                 {providers.map(p => (
-                                    <div key={p.name} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-start group hover:shadow-md transition">
+                                    <button
+                                        key={p.name}
+                                        onClick={() => setSelectedProvider(p.name)}
+                                        className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center group hover:shadow-md transition hover:border-primary-200 text-left w-full"
+                                    >
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border">
                                                 {p.hasLogo ? (
@@ -552,145 +507,110 @@ export const Admin: React.FC = () => {
                                                 <p className="text-xs text-slate-500">{p.hasLogo ? 'Logo Active' : 'No Logo'}</p>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col gap-2">
-                                            {/* Hidden upload */}
-                                            <label className="cursor-pointer text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded flex items-center gap-1">
-                                                <Upload size={12} /> Upload
+                                        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                            <label onClick={e => e.stopPropagation()} className="cursor-pointer text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded flex items-center gap-1">
+                                                <Upload size={12} /> Logo
                                                 <input type="file" accept="image/png" className="hidden" onChange={(e) => {
                                                     setSelectedProvider(p.name);
                                                     handleFileUpload(e, 'logo');
                                                 }} />
                                             </label>
                                             <button
-                                                onClick={() => handleDeleteProvider(p.name)}
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteProvider(p.name); }}
                                                 className="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded flex items-center gap-1"
                                             >
-                                                <Trash2 size={12} /> Delete
+                                                <Trash2 size={12} />
                                             </button>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {/* Games Tab */}
-                    {activeTab === 'games' && (
+                    {/* VIEW: Editor (Detail) */}
+                    {selectedProvider && (
                         <div className="flex flex-col h-full">
-                            {/* Mobile Back Button (Only when provider selected) */}
-                            {selectedProvider && (
+                            <div className="flex items-center justify-between mb-4">
                                 <button
                                     onClick={() => setSelectedProvider("")}
-                                    className="lg:hidden mb-4 flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold"
+                                    className="flex items-center gap-2 text-slate-600 hover:text-primary-600 font-bold bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm"
                                 >
                                     <ArrowLeft size={20} /> Back to Providers
                                 </button>
-                            )}
+                                <button
+                                    onClick={() => setIsAuthenticated(false)}
+                                    className="lg:hidden text-red-400 p-2"
+                                >
+                                    <LogOut size={20} />
+                                </button>
+                            </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 min-h-[500px]">
-                                {/* Sidebar List (Provider Selector) */}
-                                {/* Mobile: Show only if NO provider selected. Desktop: Always show. */}
-                                <div className={`
-                                    bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col
-                                    ${selectedProvider ? 'hidden lg:flex' : 'flex'}
-                                    lg:h-[calc(100vh-200px)] lg:overflow-hidden
-                                `}>
-                                    <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-700">
-                                        Select Provider
+                            <div className="space-y-6">
+                                <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-bold">Edit Game List</h3>
+                                        <button
+                                            onClick={handleSaveGames}
+                                            className="flex items-center gap-2 bg-green-600 text-white px-4 py-3 md:py-2 rounded-lg hover:bg-green-700 transition text-sm md:text-base shadow-sm active:scale-95"
+                                        >
+                                            <Save size={18} /> <span className="inline">Save Changes</span>
+                                        </button>
                                     </div>
-                                    <div className="lg:overflow-y-auto flex-1 p-2 space-y-1">
-                                        {providers.map(p => (
-                                            <button
-                                                key={p.name}
-                                                onClick={() => setSelectedProvider(p.name)}
-                                                className={`w-full text-left px-4 py-4 md:py-3 rounded-lg transition-colors flex justify-between items-center ${selectedProvider === p.name ? 'bg-primary-50 text-primary-700 font-bold' : 'hover:bg-slate-50 text-slate-600'}`}
-                                            >
-                                                {p.name}
-                                                <span className="lg:hidden text-slate-300">→</span>
-                                            </button>
+                                    <p className="text-sm text-slate-500 mb-2">Enter game names, one per line.</p>
+                                    <textarea
+                                        value={gamesContent}
+                                        onChange={e => setGamesContent(e.target.value)}
+                                        className="w-full h-80 md:h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
+                                        placeholder="Game 1&#10;Game 2&#10;Game 3..."
+                                    />
+                                </div>
+
+                                <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                                    <h3 className="text-lg font-bold mb-4">Existing Game Images ({gameImages.length})</h3>
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-60 overflow-y-auto">
+                                        {gameImages.map(img => (
+                                            <div key={img} className="group relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200" title={img}>
+                                                <img
+                                                    src={`/providers/${encodeURIComponent(selectedProvider)}/${img}?t=${refreshTrigger}`}
+                                                    alt={img}
+                                                    className="w-full h-full object-contain"
+                                                />
+                                                <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[10px] p-1 truncate text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {img.replace('.png', '')}
+                                                </div>
+                                            </div>
                                         ))}
+                                        {gameImages.length === 0 && (
+                                            <div className="col-span-full text-center text-slate-400 py-4 text-sm">
+                                                No images found.
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                {/* Editor */}
-                                {/* Mobile: Show only if provider selected. Desktop: Always show (col-span-2). */}
-                                <div className={`
-                                    lg:col-span-2 space-y-6 flex flex-col
-                                    ${selectedProvider ? 'flex' : 'hidden lg:flex'}
-                                `}>
-                                    {selectedProvider ? (
-                                        <>
-                                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <h3 className="text-lg font-bold">Edit Game List</h3>
-                                                    <button
-                                                        onClick={handleSaveGames}
-                                                        className="flex items-center gap-2 bg-green-600 text-white px-4 py-3 md:py-2 rounded-lg hover:bg-green-700 transition text-sm md:text-base shadow-sm active:scale-95"
-                                                    >
-                                                        <Save size={18} /> <span className="inline">Save Changes</span>
-                                                    </button>
-                                                </div>
-                                                <p className="text-sm text-slate-500 mb-2">Enter game names, one per line.</p>
-                                                <textarea
-                                                    value={gamesContent}
-                                                    onChange={e => setGamesContent(e.target.value)}
-                                                    className="w-full h-80 md:h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-                                                    placeholder="Game 1&#10;Game 2&#10;Game 3..."
-                                                />
-                                            </div>
-
-                                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
-                                                <h3 className="text-lg font-bold mb-4">Existing Game Images ({gameImages.length})</h3>
-                                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-60 overflow-y-auto">
-                                                    {gameImages.map(img => (
-                                                        <div key={img} className="group relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200" title={img}>
-                                                            <img
-                                                                src={`/providers/${encodeURIComponent(selectedProvider)}/${img}?t=${refreshTrigger}`}
-                                                                alt={img}
-                                                                className="w-full h-full object-contain"
-                                                            />
-                                                            <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-[10px] p-1 truncate text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                {img.replace('.png', '')}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                    {gameImages.length === 0 && (
-                                                        <div className="col-span-full text-center text-slate-400 py-4 text-sm">
-                                                            No images found.
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
-                                                <h3 className="text-lg font-bold mb-4">Upload Game Image</h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Game Name"
-                                                        id="gameNameInput"
-                                                        className="border border-slate-300 rounded-lg px-4 py-3 md:py-2 outline-none"
-                                                    />
-                                                    <label className="flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-3 md:py-2 rounded-lg cursor-pointer hover:bg-slate-900 transition active:scale-95 shadow-sm">
-                                                        <Upload size={18} /> Select Image
-                                                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                                                            const nameInput = document.getElementById('gameNameInput') as HTMLInputElement;
-                                                            if (!nameInput.value) {
-                                                                alert("Please enter Game Name first");
-                                                                e.target.value = '';
-                                                                return;
-                                                            }
-                                                            handleFileUpload(e, 'game', nameInput.value);
-                                                        }} />
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="hidden lg:flex h-full items-center justify-center text-slate-400 bg-white/50 rounded-xl border-dashed border-2 border-slate-200">
-                                            Select a provider to manage games
-                                        </div>
-                                    )}
+                                <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+                                    <h3 className="text-lg font-bold mb-4">Upload Game Image</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <input
+                                            type="text"
+                                            placeholder="Game Name"
+                                            id="gameNameInput"
+                                            className="border border-slate-300 rounded-lg px-4 py-3 md:py-2 outline-none"
+                                        />
+                                        <label className="flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-3 md:py-2 rounded-lg cursor-pointer hover:bg-slate-900 transition active:scale-95 shadow-sm">
+                                            <Upload size={18} /> Select Image
+                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                                                const nameInput = document.getElementById('gameNameInput') as HTMLInputElement;
+                                                if (!nameInput.value) {
+                                                    alert("Please enter Game Name first");
+                                                    e.target.value = '';
+                                                    return;
+                                                }
+                                                handleFileUpload(e, 'game', nameInput.value);
+                                            }} />
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
