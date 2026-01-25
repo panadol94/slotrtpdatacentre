@@ -128,8 +128,25 @@ app.post('/api/register', async (req, res) => {
     const db = getDb();
 
     try {
-        // 1. Verify Code if provided (Logic to come later with Bots)
-        // For now, allow direct registration or check a static code
+        // 1. Verify Code if provided
+        if (code) {
+            // Find valid code in DB
+            const validCode = await db.get(
+                `SELECT * FROM verification_codes 
+                  WHERE code = ? AND (phone = ? OR phone = ?) AND expires_at > ?`,
+                [code, username, username.replace('+', ''), new Date().toISOString()]
+            );
+
+            if (!validCode) {
+                return res.status(400).json({ error: 'Invalid or expired verification code' });
+            }
+
+            // Optional: Delete code after use
+            await db.run('DELETE FROM verification_codes WHERE id = ?', [validCode.id]);
+        } else {
+            // Enforce Code Requirement (Uncomment to force)
+            return res.status(400).json({ error: 'Verification code is required' });
+        }
 
         // 2. Hash Password
         const hashedPassword = await bcrypt.hash(password, 10);

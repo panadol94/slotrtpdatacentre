@@ -587,18 +587,18 @@ export const Admin: React.FC = () => {
                                 </button>
                             )}
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 h-full">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 min-h-[500px]">
                                 {/* Sidebar List (Provider Selector) */}
                                 {/* Mobile: Show only if NO provider selected. Desktop: Always show. */}
                                 <div className={`
-                                    bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col
-                                    ${selectedProvider ? 'hidden lg:flex' : 'flex h-full'}
-                                    lg:h-[calc(100vh-200px)]
+                                    bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col
+                                    ${selectedProvider ? 'hidden lg:flex' : 'flex'}
+                                    lg:h-[calc(100vh-200px)] lg:overflow-hidden
                                 `}>
                                     <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-700">
                                         Select Provider
                                     </div>
-                                    <div className="overflow-y-auto flex-1 p-2 space-y-1">
+                                    <div className="lg:overflow-y-auto flex-1 p-2 space-y-1">
                                         {providers.map(p => (
                                             <button
                                                 key={p.name}
@@ -615,8 +615,8 @@ export const Admin: React.FC = () => {
                                 {/* Editor */}
                                 {/* Mobile: Show only if provider selected. Desktop: Always show (col-span-2). */}
                                 <div className={`
-                                    lg:col-span-2 space-y-6
-                                    ${selectedProvider ? 'block' : 'hidden lg:block'}
+                                    lg:col-span-2 space-y-6 flex flex-col
+                                    ${selectedProvider ? 'flex' : 'hidden lg:flex'}
                                 `}>
                                     {selectedProvider ? (
                                         <>
@@ -634,7 +634,7 @@ export const Admin: React.FC = () => {
                                                 <textarea
                                                     value={gamesContent}
                                                     onChange={e => setGamesContent(e.target.value)}
-                                                    className="w-full h-64 md:h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                                                    className="w-full h-80 md:h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                                                     placeholder="Game 1&#10;Game 2&#10;Game 3..."
                                                 />
                                             </div>
