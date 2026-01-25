@@ -1,6 +1,6 @@
 // Imports at top
 import React, { useState, useEffect, useRef } from 'react';
-import { Server, Layout, Folder, FileText, Image, LogOut, Plus, Trash2, Save, Upload, Check, AlertCircle, X } from 'lucide-react';
+import { Server, Layout, Folder, FileText, Image, LogOut, Plus, Trash2, Save, Upload, Check, AlertCircle, X, Menu } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { removeBackground } from '@imgly/background-removal';
 
@@ -396,11 +396,13 @@ export const Admin: React.FC = () => {
         }
     };
 
-    // --- Views ---
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // ... Views ...
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-900">
+            <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
                 <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm">
                     <h1 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <Server className="text-primary-600" /> Admin Panel
@@ -425,65 +427,97 @@ export const Admin: React.FC = () => {
         );
     }
 
+    const SidebarContent = () => (
+        <>
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Server size={20} className="text-primary-400" /> Control Center
+                </h2>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white">
+                    <X size={24} />
+                </button>
+            </div>
+            <nav className="flex-1 p-4 space-y-2">
+                <button
+                    onClick={() => { setActiveTab('providers'); setIsMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'providers' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
+                >
+                    <Folder size={18} /> Providers
+                </button>
+                <button
+                    onClick={() => { setActiveTab('games'); setIsMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'games' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
+                >
+                    <FileText size={18} /> Games & Images
+                </button>
+            </nav>
+            <div className="p-4 border-t border-slate-700">
+                <button
+                    onClick={() => setIsAuthenticated(false)}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition"
+                >
+                    <LogOut size={18} /> Logout
+                </button>
+            </div>
+        </>
+    );
+
     return (
-        <div className="min-h-screen bg-slate-50 flex">
-            {/* Sidebar */}
-            <div className="w-64 bg-slate-900 text-slate-300 flex flex-col">
-                <div className="p-6 border-b border-slate-700">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <Server size={20} className="text-primary-400" /> Control Center
-                    </h2>
-                </div>
-                <nav className="flex-1 p-4 space-y-2">
-                    <button
-                        onClick={() => setActiveTab('providers')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'providers' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
-                    >
-                        <Folder size={18} /> Providers
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('games')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'games' ? 'bg-primary-600 text-white' : 'hover:bg-slate-800'}`}
-                    >
-                        <FileText size={18} /> Games & Images
-                    </button>
-                </nav>
-                <div className="p-4 border-t border-slate-700">
-                    <button
-                        onClick={() => setIsAuthenticated(false)}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition"
-                    >
-                        <LogOut size={18} /> Logout
-                    </button>
-                </div>
+        <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+
+            {/* Mobile Header */}
+            <div className="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-20 sticky top-0 shadow-md">
+                <h1 className="font-bold text-lg flex items-center gap-2">
+                    <Server size={18} className="text-primary-400" /> Admin
+                </h1>
+                <button onClick={() => setIsMobileMenuOpen(true)}>
+                    <Menu size={24} />
+                </button>
             </div>
 
+            {/* Sidebar (Desktop + Mobile Drawer) */}
+            <div className={`
+                fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+                ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}>
+                <SidebarContent />
+            </div>
+
+            {/* Mobile Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto">
-                {/* Undo default styles */}
-                <div className="p-8">
+            <div className="flex-1 overflow-y-auto h-[calc(100vh-64px)] md:h-screen">
+                <div className="p-4 md:p-8 max-w-7xl mx-auto">
 
                     {/* Header */}
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-3xl font-bold text-slate-800">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
                             {activeTab === 'providers' ? 'Manage Providers' : 'Manage Games'}
                         </h1>
                         {statusMsg && (
-                            <div className={`px-4 py-2 rounded-lg flex items-center gap-2 ${statusMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                {statusMsg.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
-                                {statusMsg.text}
-                                <button onClick={() => setStatusMsg(null)} className="ml-2 hover:opacity-70"><X size={14} /></button>
+                            <div className={`w-full md:w-auto px-4 py-2 rounded-lg flex items-center justify-between gap-2 ${statusMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                <div className="flex items-center gap-2">
+                                    {statusMsg.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
+                                    <span className="text-sm font-medium">{statusMsg.text}</span>
+                                </div>
+                                <button onClick={() => setStatusMsg(null)} className="hover:opacity-70"><X size={14} /></button>
                             </div>
                         )}
                     </div>
 
                     {/* Providers Tab */}
                     {activeTab === 'providers' && (
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             {/* Create New */}
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                                 <h3 className="text-lg font-bold mb-4">Add New Provider</h3>
-                                <div className="flex gap-4">
+                                <div className="flex flex-col sm:flex-row gap-3">
                                     <input
                                         type="text"
                                         placeholder="Provider Name (e.g. Mega888)"
@@ -494,7 +528,7 @@ export const Admin: React.FC = () => {
                                     <button
                                         onClick={handleCreateProvider}
                                         disabled={!newProviderName}
-                                        className="bg-primary-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
+                                        className="bg-primary-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-primary-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         <Plus size={18} /> Create
                                     </button>
@@ -502,7 +536,7 @@ export const Admin: React.FC = () => {
                             </div>
 
                             {/* List */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                                 {providers.map(p => (
                                     <div key={p.name} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex justify-between items-start group hover:shadow-md transition">
                                         <div className="flex items-center gap-4">
@@ -514,14 +548,14 @@ export const Admin: React.FC = () => {
                                                 )}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-slate-800">{p.name}</h4>
+                                                <h4 className="font-bold text-slate-800 break-all">{p.name}</h4>
                                                 <p className="text-xs text-slate-500">{p.hasLogo ? 'Logo Active' : 'No Logo'}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             {/* Hidden upload */}
                                             <label className="cursor-pointer text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded flex items-center gap-1">
-                                                <Upload size={12} /> Upload Logo
+                                                <Upload size={12} /> Upload
                                                 <input type="file" accept="image/png" className="hidden" onChange={(e) => {
                                                     setSelectedProvider(p.name);
                                                     handleFileUpload(e, 'logo');
@@ -542,9 +576,9 @@ export const Admin: React.FC = () => {
 
                     {/* Games Tab */}
                     {activeTab === 'games' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                             {/* Sidebar List */}
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-200px)] flex flex-col">
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-64 lg:h-[calc(100vh-200px)] flex flex-col order-2 lg:order-1">
                                 <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-700">
                                     Select Provider
                                 </div>
@@ -562,31 +596,31 @@ export const Admin: React.FC = () => {
                             </div>
 
                             {/* Editor */}
-                            <div className="lg:col-span-2 space-y-6">
+                            <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
                                 {selectedProvider ? (
                                     <>
-                                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-lg font-bold">Edit Game List</h3>
                                                 <button
                                                     onClick={handleSaveGames}
-                                                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                                                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm md:text-base"
                                                 >
-                                                    <Save size={18} /> Save Changes
+                                                    <Save size={18} /> <span className="hidden sm:inline">Save Changes</span>
                                                 </button>
                                             </div>
-                                            <p className="text-sm text-slate-500 mb-2">Enter game names, one per line. These names must match image filenames exactly.</p>
+                                            <p className="text-sm text-slate-500 mb-2">Enter game names, one per line.</p>
                                             <textarea
                                                 value={gamesContent}
                                                 onChange={e => setGamesContent(e.target.value)}
-                                                className="w-full h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                                                className="w-full h-64 md:h-96 border border-slate-300 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                                                 placeholder="Game 1&#10;Game 2&#10;Game 3..."
                                             />
                                         </div>
 
-                                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                                             <h3 className="text-lg font-bold mb-4">Existing Game Images ({gameImages.length})</h3>
-                                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-60 overflow-y-auto">
+                                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-60 overflow-y-auto">
                                                 {gameImages.map(img => (
                                                     <div key={img} className="group relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200" title={img}>
                                                         <img
@@ -601,18 +635,18 @@ export const Admin: React.FC = () => {
                                                 ))}
                                                 {gameImages.length === 0 && (
                                                     <div className="col-span-full text-center text-slate-400 py-4 text-sm">
-                                                        No images found. Upload some!
+                                                        No images found.
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
                                             <h3 className="text-lg font-bold mb-4">Upload Game Image</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <input
                                                     type="text"
-                                                    placeholder="Game Name (Exact Match)"
+                                                    placeholder="Game Name"
                                                     id="gameNameInput"
                                                     className="border border-slate-300 rounded-lg px-4 py-2 outline-none"
                                                 />
@@ -629,11 +663,10 @@ export const Admin: React.FC = () => {
                                                     }} />
                                                 </label>
                                             </div>
-                                            <p className="text-xs text-slate-400 mt-2">*Image will be saved as [GameName].png</p>
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="h-full flex items-center justify-center text-slate-400 bg-white/50 rounded-xl border-dashed border-2 border-slate-200">
+                                    <div className="h-48 md:h-full flex items-center justify-center text-slate-400 bg-white/50 rounded-xl border-dashed border-2 border-slate-200">
                                         Select a provider to manage games
                                     </div>
                                 )}
@@ -643,6 +676,13 @@ export const Admin: React.FC = () => {
 
                 </div>
             </div>
+            {/* Image Editor Modal */}
+            <ImageUploaderModal
+                isOpen={showImageModal}
+                onClose={() => setShowImageModal(false)}
+                onUpload={handleUploadProcessed}
+                initialImage={undefined}
+            />
         </div>
     );
 };
