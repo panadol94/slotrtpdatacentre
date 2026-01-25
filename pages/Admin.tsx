@@ -26,6 +26,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
                     <h1 className="text-2xl font-bold mb-4">⚠️ Admin Panel Crashed</h1>
                     <pre className="bg-white p-4 rounded border border-red-200 overflow-auto text-xs font-mono">
                         {this.state.error?.toString()}
+                        {'\n\nSuggestion: Clear browser cache or check hook order.'}
                     </pre>
                     <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                         Reload Page
@@ -178,99 +179,18 @@ const ImageUploaderModal: React.FC<ImageUploaderModalProps> = ({ isOpen, onClose
 // Internal Content Component
 const AdminContent: React.FC = () => {
 
-    // New State for Advanced Features
+    // 1. ALL HOOKS MUST BE DECLARED AT TOP LEVEL (Before any return)
+    // ----------------------------------------------------
+
+    // Auth State
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [password, setPassword] = useState("");
+
+    // Tool State
     const [viewMode, setViewMode] = useState<'list' | 'raw'>('list');
     const [editingGame, setEditingGame] = useState<{ name: string, originalName: string } | null>(null);
     const [showImageModal, setShowImageModal] = useState(false);
     const [uploadTargetGame, setUploadTargetGame] = useState<string>("");
-
-    const handleUploadProcessed = async (blob: Blob) => {
-        if (!selectedProvider || !uploadTargetGame) return;
-
-        const formData = new FormData();
-        formData.append('file', blob, 'image.png');
-        formData.append('provider', selectedProvider);
-        formData.append('type', 'game');
-        formData.append('gameName', uploadTargetGame);
-
-        try {
-            setStatusMsg({ type: 'success', text: "Uploading processed image..." });
-            const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
-            if (res.ok) {
-                setStatusMsg({ type: 'success', text: "Image updated!" });
-                fetchImages(selectedProvider);
-                setShowImageModal(false);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleRenameGame = async () => {
-        if (!editingGame || !selectedProvider) return;
-        if (editingGame.name === editingGame.originalName) {
-            setEditingGame(null);
-            return;
-        }
-
-        try {
-            // 1. Rename Image File
-            await fetch(`${API_URL}/rename-file`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    provider: selectedProvider,
-                    oldName: editingGame.originalName,
-                    newName: editingGame.name
-                })
-            });
-
-            // 2. Update Text List Logic
-            // Parse current content -> find line -> replace -> save
-            const lines = gamesContent.split('\n');
-            const newLines = lines.map(line => line.trim() === editingGame.originalName ? editingGame.name : line);
-
-            // Save Updated List
-            await fetch(`${API_URL}/games/${encodeURIComponent(selectedProvider)}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: newLines.join('\n') })
-            });
-
-            // Refresh
-            setGamesContent(newLines.join('\n'));
-            fetchImages(selectedProvider);
-            setStatusMsg({ type: 'success', text: "Game renamed successfully" });
-            setEditingGame(null);
-
-        } catch (err) {
-            console.error(err);
-            setStatusMsg({ type: 'error', text: "Failed to rename" });
-        }
-    };
-
-    // ... Inside Render -> Games Tab ...
-    // Replace the simple textarea with this Toggle View
-
-    /* 
-       UI Implementation:
-       Toggle Button: [List View] | [Raw Text]
-       
-       List View:
-       - Maps `gamesContent.split('\n')`
-       - Row: [Image Thumbnail] [Input Field (Name)] [Crop/Upload Button] [Delete Button]
-       
-       Raw Text: (Keep existing textarea for bulk paste)
-    */
-
-    // Helper to get image for a game name
-    const getGameImage = (name: string) => {
-        const match = gameImages.find(img => img.replace(/\.(png|jpg|webp)$/i, '') === name);
-        return match ? `/providers/${encodeURIComponent(selectedProvider)}/${match}?t=${refreshTrigger}` : null;
-    };
-
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [password, setPassword] = useState("");
 
     // Data State
     const [providers, setProviders] = useState<{ name: string, hasLogo: boolean }[]>([]);
@@ -283,9 +203,13 @@ const AdminContent: React.FC = () => {
     const [gamesContent, setGamesContent] = useState("");
     const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+    // WhatsApp State (Now correctly placed)
+    const [waStatus, setWaStatus] = useState<{ status: string, qr: string | null }>({ status: 'LOADING', qr: null });
+
     // APIs
     const API_URL = '/api';
 
+    // Effects
     useEffect(() => {
         if (isAuthenticated) {
             fetchProviders();
@@ -297,6 +221,32 @@ const AdminContent: React.FC = () => {
             fetchGames(selectedProvider);
         }
     }, [selectedProvider]);
+
+    // WA Polling Effect (Now correctly placed)
+    useEffect(() => {
+        let interval: any = null;
+        if (isAuthenticated) {
+            interval = setInterval(fetchWaStatus, 5000); // Poll every 5s
+            fetchWaStatus();
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isAuthenticated]);
+
+    // ----------------------------------------------------
+    // 2. HELPER FUNCTIONS
+    // ----------------------------------------------------
+
+    const fetchWaStatus = async () => {
+        try {
+            const res = await fetch(`${API_URL}/whatsapp/status`);
+            const data = await res.json();
+            setWaStatus(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchProviders = async () => {
         try {
@@ -429,7 +379,31 @@ const AdminContent: React.FC = () => {
         }
     };
 
-    // ... Views ...
+    const handleUploadProcessed = async (blob: Blob) => {
+        if (!selectedProvider || !uploadTargetGame) return;
+
+        const formData = new FormData();
+        formData.append('file', blob, 'image.png');
+        formData.append('provider', selectedProvider);
+        formData.append('type', 'game');
+        formData.append('gameName', uploadTargetGame);
+
+        try {
+            setStatusMsg({ type: 'success', text: "Uploading processed image..." });
+            const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+            if (res.ok) {
+                setStatusMsg({ type: 'success', text: "Image updated!" });
+                fetchImages(selectedProvider);
+                setShowImageModal(false);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // ----------------------------------------------------
+    // 3. RENDER LOGIC
+    // ----------------------------------------------------
 
     if (!isAuthenticated) {
         return (
@@ -457,29 +431,6 @@ const AdminContent: React.FC = () => {
             </div>
         );
     }
-
-
-
-    // ... Imports
-    const [waStatus, setWaStatus] = useState<{ status: string, qr: string | null }>({ status: 'LOADING', qr: null });
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            const interval = setInterval(fetchWaStatus, 5000); // Poll every 5s
-            fetchWaStatus();
-            return () => clearInterval(interval);
-        }
-    }, [isAuthenticated]);
-
-    const fetchWaStatus = async () => {
-        try {
-            const res = await fetch(`${API_URL}/whatsapp/status`);
-            const data = await res.json();
-            setWaStatus(data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
