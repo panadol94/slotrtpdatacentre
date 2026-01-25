@@ -646,5 +646,4 @@ const ImageUploaderModal: React.FC<ImageUploaderModalProps> = ({ isOpen, onClose
         );
     };
 
-    // Import X for close button in status msg
-    import { X } from 'lucide-react';
+
