@@ -8,10 +8,13 @@ interface TerminalProps {
 }
 
 export const Terminal: React.FC<TerminalProps> = ({ logs, isActive }) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (containerRef.current) {
+      // Use scrollTop instead of scrollIntoView to prevent page vibration
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   }, [logs]);
 
   return (
@@ -27,8 +30,11 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, isActive }) => {
           <div className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-slate-300'}`}></div>
         </div>
       </div>
-      
-      <div className="h-48 overflow-y-auto p-4 font-mono text-xs md:text-sm bg-slate-50/50 scrollbar-hide">
+
+      <div
+        ref={containerRef}
+        className="h-48 overflow-y-auto p-4 font-mono text-xs md:text-sm bg-slate-50/50 scrollbar-hide"
+      >
         {logs.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-2 opacity-60">
             <p>Ready to initialize...</p>
@@ -50,7 +56,6 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, isActive }) => {
                 </span>
               </div>
             ))}
-            <div ref={bottomRef} />
           </div>
         )}
       </div>
