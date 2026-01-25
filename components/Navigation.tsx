@@ -41,6 +41,11 @@ export const Navigation: React.FC = () => {
   // Extract current path to determine active tab
   const currentPath = location.pathname === '/' ? 'home' : location.pathname.substring(1);
 
+  // Hide Navigation on Admin Panel
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
   const navItems: { id: NavTab; label: string; icon: React.FC<any>; path: string }[] = [
     { id: 'home', label: t('nav.home'), icon: Home, path: '/' },
     { id: 'trusted', label: t('nav.trusted'), icon: Grid3X3, path: '/trusted' },
@@ -68,8 +73,8 @@ export const Navigation: React.FC = () => {
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${currentPath === item.id
-                    ? 'text-primary-600'
-                    : 'text-slate-500 hover:text-slate-800'
+                  ? 'text-primary-600'
+                  : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
                 <item.icon size={18} />
@@ -110,8 +115,8 @@ export const Navigation: React.FC = () => {
               key={item.id}
               onClick={() => navigate(item.path)}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200 ${currentPath === item.id
-                  ? 'text-primary-600'
-                  : 'text-slate-400 hover:text-slate-600'
+                ? 'text-primary-600'
+                : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
               <item.icon
