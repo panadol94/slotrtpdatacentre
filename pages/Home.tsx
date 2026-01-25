@@ -368,32 +368,37 @@ export const Home: React.FC = () => {
   return (
     <div ref={containerRef} className="relative min-h-screen pb-24 pt-20 md:pt-24">
 
-      {/* Background Video Layer */}
-      <div className="absolute top-0 inset-x-0 h-[650px] overflow-hidden -z-10">
+      {/* Premium Background Layer */}
+      <div className="fixed inset-0 -z-50 overflow-hidden bg-slate-900">
+        {/* Abstract Digital Video */}
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-server-room-with-blue-lights-1994-large.mp4" type="video/mp4" />
+          <source src="https://cdn.pixabay.com/video/2019/04/20/22908-331669283_large.mp4" type="video/mp4" />
         </video>
-        {/* Gradients to fade video into the white background at the bottom and lighten it up */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/80 to-slate-50"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+
+        {/* Premium Overlay Gradients - Dark to Light Glass Fade */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-white/90 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-transparent to-slate-50/90"></div>
+
+        {/* Texture Noise for Matte Finish */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-soft-light"></div>
       </div>
 
       <div className="px-4 max-w-5xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <div className="hero-element inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-green-200 text-green-700 text-xs font-semibold mb-6 shadow-sm">
+          <div className="hero-element inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-green-200/50 text-green-800 text-xs font-bold mb-6 shadow-sm ring-1 ring-white/50">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            SYSTEM ONLINE
+            SYSTEM LIVE
           </div>
 
 
