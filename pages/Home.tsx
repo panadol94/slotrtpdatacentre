@@ -380,9 +380,10 @@ export const Home: React.FC = () => {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
+          className="absolute inset-0 w-full h-full object-cover opacity-50 scale-105"
         >
-          <source src="https://cdn.pixabay.com/video/2019/04/20/22908-331669283_large.mp4" type="video/mp4" />
+          {/* New Premium "Dark Network Nodes" Video */}
+          <source src="https://cdn.pixabay.com/video/2020/05/11/38666-419747974_large.mp4" type="video/mp4" />
         </video>
 
         {/* Premium Overlay Gradients - Dark to Light Glass Fade */}
