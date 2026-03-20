@@ -38,7 +38,6 @@ export const Navigation: React.FC = () => {
     i18n.changeLanguage(newLang);
   };
 
-  // Extract current path to determine active tab
   const currentPath = location.pathname === '/' ? 'home' : location.pathname.substring(1);
 
   // Hide Navigation on Admin Panel
@@ -55,51 +54,49 @@ export const Navigation: React.FC = () => {
 
   return (
     <>
-      {/* Desktop Top Navigation */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm hidden md:block">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="bg-gradient-to-tr from-primary-600 to-primary-400 text-white p-1.5 rounded-lg shadow-lg shadow-primary-200">
-              <Zap size={20} fill="currentColor" />
-            </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">
-              Slot RTP Data Centre
+      {/* Desktop Navigation — OpenClaw Minimal Style */}
+      <header className="fixed top-0 inset-x-0 z-50 hidden md:block">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
+            <span className="text-accent-500 text-xl">⟩</span>
+            <span className="text-lg font-serif italic text-white group-hover:text-accent-500 transition-colors">
+              SlotData
             </span>
           </div>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-1">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${currentPath === item.id
-                  ? 'text-primary-600'
-                  : 'text-slate-500 hover:text-slate-800'
+                className={`text-sm font-medium transition-colors duration-200 px-4 py-2 rounded-lg ${currentPath === item.id
+                  ? 'text-accent-500'
+                  : 'text-neutral-500 hover:text-white'
                   }`}
               >
-                <item.icon size={18} />
                 {item.label}
               </button>
             ))}
 
-            <div className="h-6 w-px bg-slate-200 mx-2"></div>
+            <div className="h-5 w-px bg-neutral-800 mx-3"></div>
 
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full text-xs font-bold transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-xs font-medium text-neutral-400 hover:text-white transition-all"
             >
-              <Globe size={14} />
+              <Globe size={12} />
               {i18n.language === 'en' ? 'EN' : 'MY'}
             </button>
 
-            {/* Install App Button (Desktop PWA) */}
+            {/* Install App Button */}
             {showInstallBtn && (
               <button
                 onClick={handleInstallClick}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-900 text-white hover:bg-slate-800 rounded-full text-xs font-bold transition-colors shadow-lg shadow-slate-200"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-500 text-white hover:bg-accent-600 rounded-lg text-xs font-bold transition-colors ml-2"
               >
-                <Download size={14} />
+                <Download size={12} />
                 {t('nav.install')}
               </button>
             )}
@@ -107,57 +104,50 @@ export const Navigation: React.FC = () => {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 inset-x-0 z-50 bg-white border-t border-slate-200 pb-safe md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      {/* Mobile Bottom Navigation — Dark Style */}
+      <nav className="fixed bottom-0 inset-x-0 z-50 bg-black/90 backdrop-blur-xl border-t border-neutral-800 pb-safe md:hidden">
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => navigate(item.path)}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200 ${currentPath === item.id
-                ? 'text-primary-600'
-                : 'text-slate-400 hover:text-slate-600'
+                ? 'text-accent-500'
+                : 'text-neutral-600 hover:text-neutral-400'
                 }`}
             >
               <item.icon
-                size={22}
-                strokeWidth={currentPath === item.id ? 2.5 : 2}
-                className={`transition-transform duration-200 ${currentPath === item.id ? '-translate-y-0.5' : ''}`}
+                size={20}
+                strokeWidth={currentPath === item.id ? 2.5 : 1.5}
               />
-              <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           ))}
         </div>
       </nav>
 
-      {/* Mobile Top Bar (Logo & Lang) */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 h-14 flex items-center justify-between px-4 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="text-primary-600">
-            <Zap size={18} fill="currentColor" />
-          </div>
-          <span className="text-sm font-bold text-slate-800 tracking-tight truncate max-w-[120px]">
-            Slot RTP
-          </span>
+      {/* Mobile Top Bar */}
+      <div className="md:hidden fixed top-0 inset-x-0 z-40 bg-black/80 backdrop-blur-xl border-b border-neutral-800/50 h-14 flex items-center justify-between px-4">
+        <div className="flex items-center gap-2" onClick={() => navigate('/')}>
+          <span className="text-accent-500 font-bold">⟩</span>
+          <span className="text-sm font-serif italic text-white">SlotData</span>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Install App Button (Mobile PWA) */}
           {showInstallBtn && (
             <button
               onClick={handleInstallClick}
-              className="flex items-center gap-1 px-2 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold shadow-md animate-pulse"
+              className="flex items-center gap-1 px-2 py-1.5 bg-accent-500 text-white rounded-lg text-[10px] font-bold"
             >
               <Download size={12} />
               APP
             </button>
           )}
-
           <button
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs font-medium text-neutral-400"
           >
-            {i18n.language === 'en' ? '🇺🇸' : '🇲🇾'}
+            <Globe size={12} />
             {i18n.language === 'en' ? 'EN' : 'MY'}
           </button>
         </div>

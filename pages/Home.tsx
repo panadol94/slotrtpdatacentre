@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Terminal } from '../components/Terminal';
 import { ResultCard } from '../components/ResultCard';
 import { LogEntry, GameResult } from '../types';
-import { Wifi, Activity, Play, Filter, ChevronDown, X, Search, Check, Zap, Lock, BatteryLow, BatteryCharging, Clock, Share2, Star, Shield, Zap as ZapIcon, TrendingUp } from 'lucide-react';
+import { Wifi, Activity, Play, Filter, ChevronDown, X, Search, Check, Zap, Lock, BatteryCharging, Clock, Share2, Star, Shield, TrendingUp, ArrowRight, Cpu, Eye, BarChart3, Globe, Layers } from 'lucide-react';
 import { PROVIDERS_LIST, PROVIDER_GAMES, DEFAULT_GAMES } from '../constants';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,6 @@ export const Home: React.FC = () => {
   const scanButtonGlowRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const providerButtonRef = useRef<HTMLButtonElement>(null);
 
   const isRestricted = RESTRICTED_PROVIDERS.includes(selectedProvider);
@@ -87,17 +86,6 @@ export const Home: React.FC = () => {
   }, [selectedProvider]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = true;
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => console.log("Video autoplay prevented:", error));
-      }
-    }
-  }, []);
-
-  useEffect(() => {
     if (!scanButtonGlowRef.current) return;
     const pulseTween = gsap.to(scanButtonGlowRef.current, {
       opacity: 0.8,
@@ -150,8 +138,6 @@ export const Home: React.FC = () => {
     setResults([]);
     setProgress(0);
     setInputError(false);
-
-    gsap.fromTo(".terminal-container", { height: "auto", opacity: 0.8 }, { opacity: 1, duration: 0.5 });
 
     let step = 0;
     const maxSteps = 20;
@@ -244,266 +230,248 @@ export const Home: React.FC = () => {
 
   const filteredProviders = PROVIDERS_LIST.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const stats = [
-    { label: "Highest RTP", value: "98.5%", icon: TrendingUp, color: "from-emerald-400 to-emerald-600" },
-    { label: "24/7", value: "Verified Data", icon: Shield, color: "from-blue-400 to-blue-600" },
-    { label: "50+", value: "Providers", icon: ZapIcon, color: "from-purple-400 to-purple-600" }
+  const features = [
+    { title: "Real-time Scanner", desc: "Live RTP data intercepted from 50+ provider servers with AI analysis.", icon: Cpu, span: "md:col-span-2" },
+    { title: "Any Provider", desc: "Pragmatic Play, PG Soft, Habanero, JILI, Mega888, and 45+ more.", icon: Layers, span: "" },
+    { title: "Verified Sources", desc: "Cross-referenced data from multiple endpoints for accuracy.", icon: Shield, span: "" },
+    { title: "Live Monitoring", desc: "Track RTP changes in real-time. Get notified when patterns shift.", icon: Eye, span: "md:col-span-2" },
+    { title: "Analytics", desc: "Historical trends, volatility mapping, and predictive signals.", icon: BarChart3, span: "" },
   ];
 
   const testimonials = [
-    { name: "Alex Chen", handle: "@alexc", text: "The RTP data here is incredibly accurate. Helped me find the best slots to play!", avatar: "A" },
-    { name: "Sarah Kim", handle: "@sarahk", text: "Finally a reliable source for slot analytics. The real-time updates are game-changing.", avatar: "S" },
-    { name: "Mike Johnson", handle: "@mjohnson", text: "Best RTP scanner I've used. Clean interface and accurate data.", avatar: "M" },
-    { name: "Lisa Wong", handle: "@lisaw", text: "The provider selection is massive. Love the detailed analytics!", avatar: "L" }
+    { text: "The RTP data here is incredibly accurate. Helped me find the best slots to play!", handle: "@alexc" },
+    { text: "Finally a reliable source for slot analytics. The real-time updates are game-changing.", handle: "@sarahk" },
+    { text: "Best RTP scanner I've used. Clean interface and accurate data.", handle: "@mjohnson" },
+    { text: "The provider selection is massive. Love the detailed analytics!", handle: "@lisaw" },
+    { text: "Been using this for 3 months now. The accuracy is unmatched.", handle: "@daveP" },
+    { text: "This scanner saved me so much time. Highly recommended!", handle: "@tommy99" },
   ];
 
   return (
-    <div ref={containerRef} className="relative min-h-screen pb-24 pt-20 md:pt-24 overflow-x-hidden">
+    <div ref={containerRef} className="relative min-h-screen pb-24 pt-16 md:pt-20 overflow-x-hidden">
 
-      {/* OpenClaw-Style Background */}
-      <div className="fixed inset-0 -z-50 overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-slate-950 to-blue-900/20"></div>
-        <video ref={videoRef} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30">
-          <source src="https://cdn.pixabay.com/video/2020/05/11/38666-419747974_large.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-        
-        {/* Animated gradient orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* ── Background ── */}
+      <div className="fixed inset-0 -z-50 overflow-hidden bg-[#0a0a0a]">
+        {/* Subtle red vignette glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-accent-500/5 blur-[150px] rounded-full"></div>
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent-500/3 blur-[100px] rounded-full"></div>
+        {/* Dot pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+          backgroundSize: '24px 24px'
+        }}></div>
       </div>
 
-      <div className="px-4 max-w-6xl mx-auto">
+      <div className="px-4 max-w-4xl mx-auto">
 
-        {/* Hero Section - OpenClaw Style */}
-        <div className="text-center mb-16 pt-8">
-          
-          {/* Badge */}
-          <div className="hero-element inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold mb-8 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
-            </span>
-            SYSTEM LIVE — Real-time Data Available
-          </div>
+        {/* ═══════════════════════════════════════
+            HERO SECTION — OpenClaw Style
+        ═══════════════════════════════════════ */}
+        <div className="text-center mb-20 pt-8 md:pt-16">
 
-          {/* Main Title - OpenClaw Style */}
+          {/* Mascot / Logo Icon */}
           <div className="hero-element mb-8">
-            <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-blue-200 tracking-tight mb-4 drop-shadow-2xl">
-              Slot RTP
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-bold text-white/90 tracking-wide">
-              DATA CENTRE
-            </h2>
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-accent-500/10 border border-accent-500/20 glow-red">
+              <Zap size={36} className="text-accent-500" fill="currentColor" />
+            </div>
           </div>
 
-          {/* Subtitle - OpenClaw style */}
-          <p className="hero-element text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-            The analytics platform that actually works.
-            <br />
-            <span className="text-white font-medium">Real-time RTP data from 50+ trusted providers.</span>
+          {/* Title — Italic Serif like OpenClaw */}
+          <h1 className="hero-element text-6xl md:text-8xl font-serif italic text-white tracking-tight mb-6">
+            SlotData
+          </h1>
+
+          {/* Subtitle — Red uppercase */}
+          <p className="hero-element text-accent-500 text-sm md:text-base font-bold uppercase tracking-[0.2em] mb-6">
+            THE RTP SCANNER THAT ACTUALLY WORKS.
           </p>
 
-          {/* Stats Grid - OpenClaw Cards */}
-          <div className="hero-element grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-12">
-            {stats.map((stat, i) => (
-              <div key={i} className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-5 hover:border-purple-500/30 transition-all duration-300 hover:-translate-y-1">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-3 shadow-lg`}>
-                    <stat.icon size={18} className="text-white" />
-                  </div>
-                  <div className="text-2xl md:text-3xl font-black text-white mb-1">{stat.value}</div>
-                  <div className="text-xs text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Description */}
+          <p className="hero-element text-neutral-400 text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+            Real-time RTP data from 50+ trusted providers. Scan any slot, track patterns, and make informed decisions.
+          </p>
 
-          {/* Provider Selector - OpenClaw Style */}
-          <div className="hero-element max-w-sm mx-auto mb-6 relative z-20">
-            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 text-xs font-bold uppercase tracking-widest">
-              <Filter size={12} /> {t('hero.select_provider')}
-            </div>
-            <button
-              ref={providerButtonRef}
-              onClick={() => !isScanning && setShowProviderModal(true)}
-              disabled={isScanning}
-              className={`w-full flex items-center justify-between gap-4 backdrop-blur-xl border-2 font-bold py-3.5 px-6 rounded-2xl shadow-xl transition-all duration-300 group
-                ${isScanning ? 'opacity-60 cursor-not-allowed border-slate-700 bg-slate-900/80 text-slate-400' :
-                  selectedProvider ? 'bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-purple-500/40 text-white hover:border-purple-400 hover:from-purple-600/30 hover:to-blue-600/30' :
-                    'bg-slate-900/80 border-slate-700/50 text-slate-300 hover:border-purple-500/40 hover:bg-slate-900/90'
-                }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all
-                  ${selectedProvider ? 'bg-gradient-to-br from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/25' : 'bg-slate-800 text-slate-400'}`}>
-                  {selectedProvider ? selectedProvider.charAt(0) : <Zap size={14} />}
-                </div>
-                <span className="truncate max-w-[160px]">{selectedProvider || t('hero.select_provider')}</span>
-              </div>
-              <ChevronDown size={18} className="text-slate-500 group-hover:text-purple-400 transition-colors" />
-            </button>
-            {!selectedProvider && !isScanning && (
-              <div className="absolute -right-2 -top-2 w-4 h-4 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 animate-pulse border-2 border-slate-950"></div>
-            )}
-          </div>
-
-          {/* User ID Input for Restricted Providers */}
-          {isRestricted && (
-            <div className="hero-element max-w-sm mx-auto mb-8">
-              <div className={`bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1 border-2 transition-all duration-300 ${inputError ? 'border-red-500/50 shadow-lg shadow-red-500/20' : 'border-slate-700/50'}`}>
-                <div className="relative flex items-center">
-                  <div className="absolute left-4 text-purple-400 pointer-events-none">
-                    <Lock size={18} />
-                  </div>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={userInputId}
-                    onChange={(e) => { setUserInputId(e.target.value); setInputError(false); }}
-                    placeholder={t('hero.enter_id', { provider: selectedProvider })}
-                    disabled={isScanning}
-                    className="w-full pl-12 pr-4 py-3.5 bg-transparent text-white font-bold placeholder:text-slate-500 placeholder:font-medium focus:outline-none text-center rounded-xl"
-                  />
-                </div>
-              </div>
-              {inputError && <p className="text-red-400 text-xs font-bold mt-2 animate-pulse">{t('hero.id_required')}</p>}
-            </div>
-          )}
-
-          {/* Start Scan Button - OpenClaw Style */}
-          <div className={`hero-element relative inline-block group w-full max-w-sm ${isRestricted ? '' : 'mt-6'}`}>
-            {!isMaintenance && (
-              <>
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 to-blue-600/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div ref={scanButtonGlowRef} className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
-              </>
-            )}
-            <button
-              ref={buttonRef}
-              onClick={startScan}
-              disabled={isScanning || isMaintenance}
-              className={`relative w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl overflow-hidden transition-all duration-300 transform
-                ${isMaintenance ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' :
-                  isScanning ? 'cursor-not-allowed bg-slate-800/90 text-white border border-slate-700' :
-                    'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-purple-500/30 border border-white/10 hover:scale-[1.02] active:scale-[0.98]'
-                }`}
-            >
-              {!isScanning && !isMaintenance && (
-                <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 transition-transform duration-1000 group-hover:translate-x-[150%]"></div>
-              )}
-              {isScanning && (
-                <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-300" style={{ width: `${progress}%` }}></div>
-              )}
-              <div className="relative z-10 flex items-center gap-2">
-                {isScanning ? (
-                  <><Activity className="animate-spin" /><span className="tracking-wide">{t('hero.scanning')} {Math.round(progress)}%</span></>
-                ) : isMaintenance ? (
-                  <><Lock size={18} /> {t('hero.maintenance')}</>
-                ) : (
-                  <><Play fill="currentColor" className="animate-pulse" /> {t('hero.start_scan')}</>
-                )}
-              </div>
-            </button>
+          {/* Announcement Pill */}
+          <div className="hero-element mb-16">
+            <a href="#scanner" className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-neutral-900 border border-neutral-800 hover:border-accent-500/30 transition-all pill-glow group">
+              <span className="px-2 py-0.5 rounded-md bg-accent-500 text-white text-[10px] font-bold uppercase">Live</span>
+              <span className="text-sm text-neutral-300">Real-time data from 50+ providers</span>
+              <ArrowRight size={14} className="text-accent-500 group-hover:translate-x-1 transition-transform" />
+            </a>
           </div>
         </div>
 
-        {/* Why Choose Us Section - OpenClaw Style */}
-        <div className="hero-element mb-16">
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Why Choose Us</h3>
-            <p className="text-slate-400">Everything you need to make informed decisions</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: "Real-time Data", desc: "Live RTP updates from 50+ providers with minute-by-minute accuracy", icon: Wifi },
-              { title: "Verified Sources", desc: "All data is cross-referenced and verified from trusted gaming providers", icon: Shield },
-              { title: "Instant Results", desc: "Get comprehensive analytics in seconds with our advanced algorithms", icon: ZapIcon }
-            ].map((item, i) => (
-              <div key={i} className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300 group hover:-translate-y-1">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center mb-4 group-hover:from-purple-500/30 group-hover:to-blue-500/30 transition-all">
-                  <item.icon size={22} className="text-purple-400" />
-                </div>
-                <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Testimonials - OpenClaw Grid Style */}
-        <div className="hero-element mb-16">
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">What People Say</h3>
+        {/* ═══════════════════════════════════════
+            TESTIMONIALS — ⟩ What People Say
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+              <span className="section-chevron text-lg">⟩</span> What People Say
+            </h2>
+            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
+              View all <ArrowRight size={12} />
+            </span>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-5 hover:border-purple-500/30 transition-all duration-300 group">
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, j) => <Star key={j} size={14} className="text-yellow-400 fill-yellow-400" />)}
-                </div>
-                <p className="text-sm text-slate-300 mb-4 leading-relaxed line-clamp-3">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm">{t.avatar}</div>
-                  <div>
-                    <div className="text-sm font-semibold text-white">{t.name}</div>
-                    <div className="text-xs text-slate-500">{t.handle}</div>
-                  </div>
-                </div>
+              <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-5 card-hover">
+                <p className="text-sm text-neutral-300 mb-4 leading-relaxed">"{t.text}"</p>
+                <span className="text-accent-500 text-sm font-semibold">{t.handle}</span>
               </div>
             ))}
           </div>
         </div>
+
+
+        {/* ═══════════════════════════════════════
+            SCANNER SECTION — ⟩ Start Scanning
+        ═══════════════════════════════════════ */}
+        <div id="scanner" className="mb-20 scroll-mt-20">
+          <h2 className="hero-element text-xl md:text-2xl font-bold text-white flex items-center gap-2 mb-8">
+            <span className="section-chevron text-lg">⟩</span> Start Scanning
+          </h2>
+
+          <div className="hero-element bg-neutral-900/50 border border-neutral-800 rounded-3xl p-6 md:p-8">
+            
+            {/* Provider Selector */}
+            <div className="max-w-md mx-auto mb-6 relative z-20">
+              <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 block text-center">
+                {t('hero.select_provider')}
+              </label>
+              <button
+                ref={providerButtonRef}
+                onClick={() => !isScanning && setShowProviderModal(true)}
+                disabled={isScanning}
+                className={`w-full flex items-center justify-between gap-4 border font-semibold py-3.5 px-5 rounded-xl transition-all duration-300 group
+                  ${isScanning ? 'opacity-60 cursor-not-allowed border-neutral-800 bg-neutral-900 text-neutral-500' :
+                    selectedProvider ? 'bg-neutral-900 border-accent-500/40 text-white hover:border-accent-500/60' :
+                      'bg-neutral-900 border-neutral-700 text-neutral-400 hover:border-accent-500/30'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all
+                    ${selectedProvider ? 'bg-accent-500 text-white' : 'bg-neutral-800 text-neutral-500'}`}>
+                    {selectedProvider ? selectedProvider.charAt(0) : <Zap size={14} />}
+                  </div>
+                  <span className="truncate">{selectedProvider || t('hero.select_provider')}</span>
+                </div>
+                <ChevronDown size={16} className="text-neutral-600 group-hover:text-accent-500 transition-colors" />
+              </button>
+            </div>
+
+            {/* User ID Input for Restricted Providers */}
+            {isRestricted && (
+              <div className="max-w-md mx-auto mb-6">
+                <div className={`bg-neutral-950 rounded-xl p-1 border transition-all duration-300 ${inputError ? 'border-accent-500/50' : 'border-neutral-800'}`}>
+                  <div className="relative flex items-center">
+                    <div className="absolute left-4 text-accent-500 pointer-events-none">
+                      <Lock size={16} />
+                    </div>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={userInputId}
+                      onChange={(e) => { setUserInputId(e.target.value); setInputError(false); }}
+                      placeholder={t('hero.enter_id', { provider: selectedProvider })}
+                      disabled={isScanning}
+                      className="w-full pl-11 pr-4 py-3 bg-transparent text-white font-medium placeholder:text-neutral-600 focus:outline-none text-center rounded-xl text-sm"
+                    />
+                  </div>
+                </div>
+                {inputError && <p className="text-accent-500 text-xs font-medium mt-2 text-center">{t('hero.id_required')}</p>}
+              </div>
+            )}
+
+            {/* Scan Button */}
+            <div className={`relative inline-block group w-full max-w-md mx-auto ${isRestricted ? '' : 'mt-2'}`} style={{ display: 'flex', justifyContent: 'center' }}>
+              <div className="w-full max-w-md">
+                {!isMaintenance && (
+                  <div ref={scanButtonGlowRef} className="absolute -inset-1 bg-accent-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                )}
+                <button
+                  ref={buttonRef}
+                  onClick={startScan}
+                  disabled={isScanning || isMaintenance}
+                  className={`relative w-full flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-base overflow-hidden transition-all duration-300
+                    ${isMaintenance ? 'bg-neutral-900 text-neutral-500 cursor-not-allowed border border-neutral-800' :
+                      isScanning ? 'cursor-not-allowed bg-neutral-900 text-white border border-neutral-800' :
+                        'bg-accent-500 text-white hover:bg-accent-600 shadow-lg shadow-accent-500/20 border border-accent-400/20'
+                    }`}
+                >
+                  {!isScanning && !isMaintenance && (
+                    <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 transition-transform duration-1000 group-hover:translate-x-[150%]"></div>
+                  )}
+                  {isScanning && (
+                    <div className="absolute inset-y-0 left-0 bg-accent-600 transition-all duration-300 rounded-xl" style={{ width: `${progress}%` }}></div>
+                  )}
+                  <div className="relative z-10 flex items-center gap-2">
+                    {isScanning ? (
+                      <><Activity className="animate-spin" size={18} /><span className="tracking-wide">{t('hero.scanning')} {Math.round(progress)}%</span></>
+                    ) : isMaintenance ? (
+                      <><Lock size={16} /> {t('hero.maintenance')}</>
+                    ) : (
+                      <><Play fill="currentColor" size={16} /> {t('hero.start_scan')}</>
+                    )}
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         {/* Terminal Section */}
         <div className="terminal-container">
           <Terminal logs={logs} isActive={isScanning} />
         </div>
 
-        {/* Results Grid */}
+
+        {/* ═══════════════════════════════════════
+            RESULTS — Detected Signals
+        ═══════════════════════════════════════ */}
         {results.length > 0 && (
-          <div ref={resultsRef} className="mt-12">
+          <div ref={resultsRef} className="mt-12 mb-20">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <Wifi className="text-purple-400" /> {t('results.detected_signals')} ({results.length})
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="section-chevron text-lg">⟩</span> {t('results.detected_signals')} ({results.length})
               </h2>
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-500 bg-slate-900/60 px-2 py-1 rounded hidden sm:inline-block">ID: {Date.now().toString().slice(-6)}</span>
-                <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity">
+                <span className="text-xs font-mono text-neutral-600 bg-neutral-900 px-2 py-1 rounded hidden sm:inline-block">
+                  ID: {Date.now().toString().slice(-6)}
+                </span>
+                <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 bg-accent-500 text-white text-xs font-bold rounded-lg hover:bg-accent-600 transition-colors">
                   <Share2 size={14} /> {t('results.share')}
                 </button>
               </div>
             </div>
 
-            <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/50 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-neutral-900/50 border border-neutral-800 rounded-2xl overflow-hidden">
               {results.map((game, i) => (
-                <div key={game.id} className="result-row relative flex items-center justify-between p-4 group hover:bg-slate-800/50 transition-all duration-300 border-b border-slate-800/30 last:border-b-0">
+                <div key={game.id} className="result-row relative flex items-center justify-between p-4 group hover:bg-neutral-800/50 transition-all duration-200 border-b border-neutral-800/50 last:border-b-0">
                   <div className="flex items-center gap-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm border-2 ${i < 3 ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white border-yellow-300' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${i < 3 ? 'bg-accent-500 text-white' : 'bg-neutral-800 text-neutral-500'}`}>
                       {i + 1}
                     </div>
                     <div>
-                      <h3 className="font-bold text-white group-hover:text-purple-300 transition-colors">{game.name}</h3>
+                      <h3 className="font-semibold text-white group-hover:text-accent-400 transition-colors text-sm">{game.name}</h3>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-800 px-2 py-0.5 rounded">{game.provider}</span>
-                        {game.volatility === 'High' && <span className="text-[10px] text-red-400 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>HOT</span>}
+                        <span className="text-[10px] uppercase font-medium text-neutral-600 bg-neutral-800 px-2 py-0.5 rounded">{game.provider}</span>
+                        {game.volatility === 'High' && <span className="text-[10px] text-accent-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span>HOT</span>}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4">
                     <div className="hidden sm:block text-right">
-                      <div className="text-[10px] text-slate-500 flex items-center gap-1 justify-end"><Clock size={10} /> {t('results.last_win')}</div>
-                      <div className="text-sm text-slate-400">{game.lastWin}</div>
+                      <div className="text-[10px] text-neutral-600 flex items-center gap-1 justify-end"><Clock size={10} /> {t('results.last_win')}</div>
+                      <div className="text-sm text-neutral-500">{game.lastWin}</div>
                     </div>
                     <div className="text-right">
-                      <span className={`text-2xl font-black ${game.rtp >= 96 ? 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-400' : 'text-emerald-500'}`}>
+                      <span className={`text-xl font-black ${game.rtp >= 96 ? 'text-emerald-400' : game.rtp >= 80 ? 'text-accent-500' : 'text-neutral-500'}`}>
                         {game.rtp}%
                       </span>
-                    </div>
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${game.rtp >= 96 ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                      {game.rtp >= 96 ? <BatteryCharging size={16} /> : <Activity size={16} />}
                     </div>
                   </div>
                 </div>
@@ -512,38 +480,134 @@ export const Home: React.FC = () => {
           </div>
         )}
 
-        {/* Provider Selection Modal */}
+
+        {/* ═══════════════════════════════════════
+            FEATURES — ⟩ What It Does (Bento Grid)
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20">
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 mb-8">
+            <span className="section-chevron text-lg">⟩</span> What It Does
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {features.map((item, i) => (
+              <div key={i} className={`bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 card-hover group ${item.span}`}>
+                <div className="w-10 h-10 rounded-xl bg-accent-500/10 border border-accent-500/20 flex items-center justify-center mb-4 group-hover:bg-accent-500/20 transition-all">
+                  <item.icon size={20} className="text-accent-500" />
+                </div>
+                <h3 className="text-base font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-neutral-500 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+
+        {/* ═══════════════════════════════════════
+            PROVIDERS — ⟩ Works With Everything
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+              <span className="section-chevron text-lg">⟩</span> Works With Everything
+            </h2>
+            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
+              View all 50+ <ArrowRight size={12} />
+            </span>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {PROVIDERS_LIST.slice(0, 20).map((p, i) => (
+              <button
+                key={i}
+                onClick={() => { setSelectedProvider(p); document.getElementById('scanner')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="px-4 py-2 rounded-full bg-neutral-900 border border-neutral-800 text-sm text-neutral-400 hover:border-accent-500/30 hover:text-white transition-all"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
+
+
+        {/* ═══════════════════════════════════════
+            NEWSLETTER — ⟩ Stay in the Loop
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20">
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2 mb-4">
+            <span className="section-chevron text-lg">⟩</span> Stay in the Loop
+          </h2>
+          <p className="text-neutral-500 text-sm mb-6">Get updates on new features, providers, and analytics insights. No spam.</p>
+          <div className="flex gap-3 max-w-md">
+            <input 
+              type="email"
+              placeholder="your@email.com" 
+              className="flex-1 px-4 py-3 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-accent-500/50 transition-colors"
+            />
+            <button className="px-6 py-3 bg-accent-500 text-white font-bold text-sm rounded-xl hover:bg-accent-600 transition-colors">
+              Subscribe
+            </button>
+          </div>
+        </div>
+
+
+        {/* ═══════════════════════════════════════
+            FOOTER — Minimal Centered
+        ═══════════════════════════════════════ */}
+        <footer className="border-t border-neutral-800 pt-8 pb-12 text-center">
+          <div className="flex items-center justify-center gap-1 mb-6">
+            <span className="text-accent-500 font-bold">⟩</span>
+            <span className="text-lg font-serif italic text-white">SlotData</span>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-sm text-neutral-500 mb-4 flex-wrap">
+            <a href="#" className="hover:text-white transition-colors">Home</a>
+            <span className="text-neutral-800">·</span>
+            <a href="#/trusted" className="hover:text-white transition-colors">Trusted</a>
+            <span className="text-neutral-800">·</span>
+            <a href="#/chat" className="hover:text-white transition-colors">Chat</a>
+            <span className="text-neutral-800">·</span>
+            <a href="https://t.me/slotdatartp" className="hover:text-white transition-colors">Telegram</a>
+          </div>
+          <p className="text-xs text-neutral-700">
+            © {new Date().getFullYear()} SlotData RTP Centre. All rights reserved.
+          </p>
+        </footer>
+
+
+        {/* ═══════════════════════════════════════
+            PROVIDER SELECTION MODAL
+        ═══════════════════════════════════════ */}
         {showProviderModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowProviderModal(false)}></div>
-            <div className="relative w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-700/50 max-h-[85vh] flex flex-col">
-              <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowProviderModal(false)}></div>
+            <div className="relative w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+              <div className="px-6 py-4 border-b border-neutral-800 flex items-center justify-between">
                 <h3 className="text-lg font-bold text-white">{t('hero.select_provider')}</h3>
-                <button onClick={() => setShowProviderModal(false)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors">
-                  <X size={20} />
+                <button onClick={() => setShowProviderModal(false)} className="p-2 hover:bg-neutral-800 rounded-lg text-neutral-500 hover:text-white transition-colors">
+                  <X size={18} />
                 </button>
               </div>
-              <div className="px-6 py-3 bg-slate-900/50 border-b border-slate-800">
+              <div className="px-6 py-3 border-b border-neutral-800">
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 text-slate-500" size={16} />
-                  <input type="text" placeholder="Search provider..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50" autoFocus />
+                  <Search className="absolute left-3 top-3 text-neutral-600" size={16} />
+                  <input type="text" placeholder="Search provider..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-neutral-950 border border-neutral-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-accent-500/30" autoFocus />
                 </div>
               </div>
-              <div className="p-6 overflow-y-auto flex-1">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              <div className="p-4 overflow-y-auto flex-1">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {filteredProviders.map((p) => (
                     <button key={p} onClick={() => { setSelectedProvider(p); setShowProviderModal(false); }}
-                      className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 group overflow-hidden
-                        ${selectedProvider === p ? 'bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-500/50 text-white' : 'bg-slate-800/50 text-slate-300 border-slate-700/50 hover:border-purple-500/30 hover:bg-slate-800'}`}>
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold ${selectedProvider === p ? 'bg-purple-500 text-white' : 'bg-slate-700 text-slate-400'}`}>
+                      className={`relative flex items-center gap-2 p-3 rounded-xl border transition-all duration-200 text-left
+                        ${selectedProvider === p ? 'bg-accent-500/10 border-accent-500/40 text-white' : 'bg-neutral-950 text-neutral-400 border-neutral-800 hover:border-accent-500/20 hover:text-white'}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${selectedProvider === p ? 'bg-accent-500 text-white' : 'bg-neutral-800 text-neutral-500'}`}>
                         {p.charAt(0)}
                       </div>
-                      <span className="text-xs font-semibold truncate">{p}</span>
-                      {selectedProvider === p && <Check size={14} className="absolute top-2 right-2 text-purple-400" />}
+                      <span className="text-xs font-medium truncate">{p}</span>
+                      {selectedProvider === p && <Check size={12} className="absolute top-2 right-2 text-accent-500" />}
                     </button>
                   ))}
                 </div>
-                {filteredProviders.length === 0 && <div className="text-center py-8 text-slate-500">No providers found</div>}
+                {filteredProviders.length === 0 && <div className="text-center py-8 text-neutral-600">No providers found</div>}
               </div>
             </div>
           </div>

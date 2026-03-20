@@ -3,29 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slot RTP Data Centre</title>
+    <title>Slot RTP Data Centre — Live RTP Scanner</title>
+    <meta name="description" content="Real-time RTP data from 50+ trusted slot providers. The analytics platform that actually works." />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              serif: ['DM Serif Display', 'serif'],
               mono: ['JetBrains Mono', 'monospace'],
             },
             colors: {
-              primary: {
-                50: '#eff6ff',
-                100: '#dbeafe',
-                500: '#3b82f6',
-                600: '#2563eb',
-                700: '#1d4ed8',
+              accent: {
+                DEFAULT: '#FF3333',
+                50: '#fff5f5',
+                100: '#ffe0e0',
+                200: '#ffb3b3',
+                300: '#ff8080',
+                400: '#ff4d4d',
+                500: '#FF3333',
+                600: '#e60000',
+                700: '#cc0000',
               },
-              gold: {
-                400: '#fbbf24',
-                500: '#f59e0b',
-                600: '#d97706',
+              surface: {
+                DEFAULT: '#0a0a0a',
+                50: '#171717',
+                100: '#1a1a1a',
+                200: '#222222',
+                300: '#2a2a2a',
+                400: '#333333',
               }
             }
           }
@@ -33,18 +42,55 @@
       }
     </script>
     <style>
-      /* Custom scrollbar for terminal */
-      .scrollbar-hide::-webkit-scrollbar {
-          display: none;
+      /* Scrollbar */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      /* Noise overlay */
+      .noise-bg::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1;
       }
-      .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+
+      /* Red glow effect */
+      .glow-red {
+        box-shadow: 0 0 40px rgba(255, 51, 51, 0.15);
       }
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+      .glow-red-sm {
+        box-shadow: 0 0 20px rgba(255, 51, 51, 0.1);
+      }
+
+      /* Smooth scroll */
+      html { scroll-behavior: smooth; }
+
+      /* Selection */
+      ::selection {
+        background: rgba(255, 51, 51, 0.3);
+        color: white;
+      }
+
+      /* Section header chevron */
+      .section-chevron {
+        color: #FF3333;
+        font-weight: 700;
+      }
+
+      /* Card hover shine */
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        border-color: rgba(255, 51, 51, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* Announcement pill */
+      .pill-glow {
+        box-shadow: 0 0 0 1px rgba(255, 51, 51, 0.2), 0 0 20px rgba(255, 51, 51, 0.05);
       }
     </style>
   <script type="importmap">
@@ -61,7 +107,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-700">
+  <body class="bg-[#0a0a0a] text-white antialiased noise-bg">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
