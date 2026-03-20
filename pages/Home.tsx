@@ -303,30 +303,6 @@ export const Home: React.FC = () => {
 
 
         {/* ═══════════════════════════════════════
-            TESTIMONIALS — ⟩ What People Say
-        ═══════════════════════════════════════ */}
-        <div className="hero-element mb-20">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-              <span className="section-chevron text-lg">⟩</span> What People Say
-            </h2>
-            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
-              View all <ArrowRight size={12} />
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-5 card-hover">
-                <p className="text-sm text-neutral-300 mb-4 leading-relaxed">"{t.text}"</p>
-                <span className="text-accent-500 text-sm font-semibold">{t.handle}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-
-        {/* ═══════════════════════════════════════
             SCANNER SECTION — ⟩ Start Scanning
         ═══════════════════════════════════════ */}
         <div id="scanner" className="mb-20 scroll-mt-20">
@@ -426,6 +402,30 @@ export const Home: React.FC = () => {
         {/* Terminal Section */}
         <div className="terminal-container">
           <Terminal logs={logs} isActive={isScanning} />
+        </div>
+
+
+        {/* ═══════════════════════════════════════
+            TESTIMONIALS — ⟩ What People Say
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20 mt-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+              <span className="section-chevron text-lg">⟩</span> What People Say
+            </h2>
+            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
+              View all <ArrowRight size={12} />
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {testimonials.map((t, i) => (
+              <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-5 card-hover">
+                <p className="text-sm text-neutral-300 mb-4 leading-relaxed">"{t.text}"</p>
+                <span className="text-accent-500 text-sm font-semibold">{t.handle}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
 
