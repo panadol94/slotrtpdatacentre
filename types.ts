@@ -5,6 +5,7 @@ export interface GameResult {
   provider: string;
   volatility: 'High' | 'Med' | 'Low';
   lastWin: string;
+  image?: string;
 }
 
 export interface LogEntry {

@@ -9,6 +9,13 @@ import { useTranslation } from 'react-i18next';
 
 const RESTRICTED_PROVIDERS = ["Mega888", "918Kiss", "Pussy888"];
 
+type GameCatalogItem = {
+  name: string;
+  image?: string;
+};
+
+const DEFAULT_GAME_ITEMS: GameCatalogItem[] = DEFAULT_GAMES.map(name => ({ name }));
+
 export const Home: React.FC = () => {
   const { t } = useTranslation();
   const [isScanning, setIsScanning] = useState(false);
@@ -18,7 +25,7 @@ export const Home: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [results, setResults] = useState<GameResult[]>([]);
   const [progress, setProgress] = useState(0);
-  const [availableGames, setAvailableGames] = useState<string[]>(DEFAULT_GAMES);
+  const [availableGames, setAvailableGames] = useState<GameCatalogItem[]>(DEFAULT_GAME_ITEMS);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [userInputId, setUserInputId] = useState("");
   const [inputError, setInputError] = useState(false);
@@ -49,22 +56,36 @@ export const Home: React.FC = () => {
     const fetchGameList = async () => {
       setIsMaintenance(false);
       if (!selectedProvider) {
-        setAvailableGames(DEFAULT_GAMES);
+        setAvailableGames(DEFAULT_GAME_ITEMS);
         return;
       }
       if (PROVIDER_GAMES[selectedProvider] && PROVIDER_GAMES[selectedProvider].length > 0) {
-        setAvailableGames(PROVIDER_GAMES[selectedProvider]);
+        setAvailableGames(PROVIDER_GAMES[selectedProvider].map(name => ({ name })));
         return;
       }
       try {
+        const jsonResponse = await fetch(`/providers/${encodeURIComponent(selectedProvider)}/games.json?t=${Date.now()}`);
+        if (jsonResponse.ok) {
+          const json = await jsonResponse.json();
+          if (Array.isArray(json) && json.length > 0) {
+            const games = json
+              .map(item => typeof item === 'string' ? { name: item } : { name: item?.title || item?.name || '', image: item?.image || item?.imageUrl || undefined })
+              .filter(item => item.name);
+            if (games.length > 0) {
+              setAvailableGames(games);
+              return;
+            }
+          }
+        }
+
         const response = await fetch(`/providers/${encodeURIComponent(selectedProvider)}/games.txt?t=${Date.now()}`);
         if (response.ok) {
           const text = await response.text();
           if (text.trim().startsWith("<")) {
-            setAvailableGames(DEFAULT_GAMES);
+            setAvailableGames(DEFAULT_GAME_ITEMS);
             return;
           }
-          const games = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+          const games = text.split('\n').map(line => line.trim()).filter(line => line.length > 0).map(name => ({ name }));
           if (games.length > 0) {
             setAvailableGames(games);
           } else {
@@ -159,7 +180,7 @@ export const Home: React.FC = () => {
         if (useGameName) {
           const randomGame = availableGames[Math.floor(Math.random() * availableGames.length)];
           const actions = ["Analysing", "Checking RTP for", "Downloading config:", "Verifying signal:", "Ping pong response:"];
-          msg = `${actions[Math.floor(Math.random() * actions.length)]} ${randomGame}...`;
+          msg = `${actions[Math.floor(Math.random() * actions.length)]} ${randomGame.name}...`;
         } else {
           msg = getRandomLogMessage();
         }
@@ -186,10 +207,11 @@ export const Home: React.FC = () => {
   };
 
   const generateResults = () => {
-    const gamePool = availableGames.length > 0 ? availableGames : DEFAULT_GAMES;
-    const newResults: GameResult[] = gamePool.map((gameName, i) => ({
+    const gamePool = availableGames.length > 0 ? availableGames : DEFAULT_GAME_ITEMS;
+    const newResults: GameResult[] = gamePool.map((game, i) => ({
       id: `game-${i}-${Date.now()}`,
-      name: gameName,
+      name: game.name,
+      image: game.image,
       rtp: Number((Math.random() * (97 - 10) + 10).toFixed(2)),
       provider: selectedProvider,
       volatility: (Math.random() * (97 - 10) + 10) > 90 ? 'High' as const : 'Med' as const,

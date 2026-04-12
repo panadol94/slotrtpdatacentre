@@ -28,6 +28,17 @@ export const ResultCard: React.FC<ResultCardProps> = ({ game }) => {
             )}
         </div>
 
+        {game.image && (
+          <div className="mb-4 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 aspect-[1/2]">
+            <img
+              src={game.image}
+              alt={game.name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+        )}
+
         <h3 className="font-bold text-slate-800 text-lg leading-tight mb-4 group-hover:text-primary-600 transition-colors">
             {game.name}
         </h3>
