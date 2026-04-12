@@ -4,6 +4,7 @@ import { ResultCard } from '../components/ResultCard';
 import { LogEntry, GameResult } from '../types';
 import { Wifi, Activity, Play, Filter, ChevronDown, X, Search, Check, Zap, Lock, BatteryCharging, Clock, Share2, Star, Shield, TrendingUp, ArrowRight, Cpu, Eye, BarChart3, Globe, Layers } from 'lucide-react';
 import { PROVIDERS_LIST, PROVIDER_GAMES, DEFAULT_GAMES } from '../constants';
+import { PRAGMATIC_PLAY_GAMES } from '../data/pragmatic_play_games';
 import gsap from 'gsap';
 import { useTranslation } from 'react-i18next';
 
@@ -59,25 +60,16 @@ export const Home: React.FC = () => {
         setAvailableGames(DEFAULT_GAME_ITEMS);
         return;
       }
+      // Use embedded data for providers with built-in game lists
+      if (selectedProvider === 'Pragmatic Play') {
+        setAvailableGames(PRAGMATIC_PLAY_GAMES.map(g => ({ name: g.title, image: g.image })));
+        return;
+      }
       if (PROVIDER_GAMES[selectedProvider] && PROVIDER_GAMES[selectedProvider].length > 0) {
         setAvailableGames(PROVIDER_GAMES[selectedProvider].map(name => ({ name })));
         return;
       }
       try {
-        const jsonResponse = await fetch(`/providers/${encodeURIComponent(selectedProvider)}/games.json?t=${Date.now()}`);
-        if (jsonResponse.ok) {
-          const json = await jsonResponse.json();
-          if (Array.isArray(json) && json.length > 0) {
-            const games = json
-              .map(item => typeof item === 'string' ? { name: item } : { name: item?.title || item?.name || '', image: item?.image || item?.imageUrl || undefined })
-              .filter(item => item.name);
-            if (games.length > 0) {
-              setAvailableGames(games);
-              return;
-            }
-          }
-        }
-
         const response = await fetch(`/providers/${encodeURIComponent(selectedProvider)}/games.txt?t=${Date.now()}`);
         if (response.ok) {
           const text = await response.text();
@@ -123,6 +115,7 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     if (results.length > 0 && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       gsap.fromTo(".result-row", { y: 20, opacity: 0 }, {
         y: 0, opacity: 1, duration: 0.4, stagger: { amount: 1.0, grid: "auto", from: "start" },
         ease: "power2.out", clearProps: "all"
@@ -428,30 +421,6 @@ export const Home: React.FC = () => {
 
 
         {/* ═══════════════════════════════════════
-            TESTIMONIALS — ⟩ What People Say
-        ═══════════════════════════════════════ */}
-        <div className="hero-element mb-20 mt-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-              <span className="section-chevron text-lg">⟩</span> What People Say
-            </h2>
-            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
-              View all <ArrowRight size={12} />
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-5 card-hover">
-                <p className="text-sm text-neutral-300 mb-4 leading-relaxed">"{t.text}"</p>
-                <span className="text-accent-500 text-sm font-semibold">{t.handle}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-
-        {/* ═══════════════════════════════════════
             RESULTS — Detected Signals
         ═══════════════════════════════════════ */}
         {results.length > 0 && (
@@ -477,11 +446,24 @@ export const Home: React.FC = () => {
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${i < 3 ? 'bg-accent-500 text-white' : 'bg-neutral-800 text-neutral-500'}`}>
                       {i + 1}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white group-hover:text-accent-400 transition-colors text-sm">{game.name}</h3>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] uppercase font-medium text-neutral-600 bg-neutral-800 px-2 py-0.5 rounded">{game.provider}</span>
-                        {game.volatility === 'High' && <span className="text-[10px] text-accent-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span>HOT</span>}
+                    <div className="flex items-center gap-3">
+                      {game.image && (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-neutral-800 flex-shrink-0 border border-neutral-700">
+                          <img 
+                            src={game.image} 
+                            alt={game.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-white group-hover:text-accent-400 transition-colors text-sm">{game.name}</h3>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] uppercase font-medium text-neutral-600 bg-neutral-800 px-2 py-0.5 rounded">{game.provider}</span>
+                          {game.volatility === 'High' && <span className="text-[10px] text-accent-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span>HOT</span>}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -501,6 +483,30 @@ export const Home: React.FC = () => {
             </div>
           </div>
         )}
+
+
+        {/* ═══════════════════════════════════════
+            TESTIMONIALS — ⟩ What People Say
+        ═══════════════════════════════════════ */}
+        <div className="hero-element mb-20 mt-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+              <span className="section-chevron text-lg">⟩</span> What People Say
+            </h2>
+            <span className="text-accent-500 text-sm font-medium hover:underline cursor-pointer flex items-center gap-1">
+              View all <ArrowRight size={12} />
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {testimonials.map((t, i) => (
+              <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-5 card-hover">
+                <p className="text-sm text-neutral-300 mb-4 leading-relaxed">"{t.text}"</p>
+                <span className="text-accent-500 text-sm font-semibold">{t.handle}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
 
         {/* ═══════════════════════════════════════

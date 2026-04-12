@@ -41,7 +41,7 @@ if (TELEGRAM_TOKEN) {
         ctx.reply(`Welcome to Slot RTP Data Centre! 🎰\n\nYour Verification Code is: *${code}*\n\nPlease enter this code on the website to complete your registration.`, { parse_mode: 'Markdown' });
     });
 
-    bot.launch().then(() => console.log('Telegram Bot started'));
+    bot.launch().then(() => console.log('Telegram Bot started')).catch(err => console.log('Telegram Bot failed (likely invalid token):', err.message));
 
     // Enable graceful stop
     process.once('SIGINT', () => bot.stop('SIGINT'));
@@ -436,26 +436,41 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     }
 });
 
-// Serve Static files (Frontend Build)
-const DIST_DIR = path.join(__dirname, 'dist');
-if (fs.existsSync(DIST_DIR)) {
-    app.use(express.static(DIST_DIR));
-}
-
-// Serve uploaded files (Providers)
+// Serve uploaded files (Providers) - MUST be before SPA fallback
 app.use('/providers', express.static(PROVIDERS_DIR));
 
-app.use((req, res) => {
+// Serve Static files (Frontend Build) with fallback disabled
+const DIST_DIR = path.join(__dirname, 'dist');
+if (fs.existsSync(DIST_DIR)) {
+    app.use(express.static(DIST_DIR, { fallthrough: true }));
+}
+
+// SPA Fallback - only for routes that don't look like static files or API routes
+// This must be the LAST route handler
+app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'API endpoint not found' });
     }
 
+    // Don't fallback to SPA for static file requests (files with extensions)
+    // This prevents returning HTML when a .json, .png, etc. is not found
+    if (/\.[^/]+$/.test(req.path)) {
+        return res.status(404).send('Not found');
+    }
+
+    // Serve index.html for SPA routes
     const indexPath = path.join(DIST_DIR, 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        // Fallback for dev mode without build
-        res.send('API Server Running. Frontend build not found. Run npm run build.');
+    try {
+        if (fs.existsSync(indexPath)) {
+            const content = fs.readFileSync(indexPath, 'utf-8');
+            res.setHeader('Content-Type', 'text/html');
+            res.send(content);
+        } else {
+            res.status(500).send('Frontend build not found. Run npm run build.');
+        }
+    } catch (err) {
+        console.error('Error serving index.html:', err);
+        res.status(500).send('Error loading page');
     }
 });
 
