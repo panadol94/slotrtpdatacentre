@@ -1,5 +1,6 @@
 
 # Stage 1: Build the Frontend
+ARG CACHEBUST=1
 FROM node:18-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
