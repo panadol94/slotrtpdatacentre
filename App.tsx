@@ -418,6 +418,35 @@ const StatCard: React.FC<{ label: string; target: number; suffix: string }> = ({
   );
 };
 
+const HeroArtwork: React.FC = () => {
+  const tiltRef = useTilt<HTMLDivElement>(8);
+  const reveal = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <div
+      ref={(el) => { (tiltRef as React.MutableRefObject<HTMLDivElement | null>).current = el; (reveal.ref as React.MutableRefObject<HTMLDivElement | null>).current = el; }}
+      className={`relative mt-10 mb-10 transition-all duration-700 ${reveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+    >
+      <div className="absolute -inset-6 bg-gradient-to-r from-[#FF3333]/12 via-[#F59E0B]/10 to-[#3B82F6]/12 blur-3xl rounded-[40px] pointer-events-none"></div>
+      <div className="absolute inset-0 rounded-[34px] border border-white/5 pointer-events-none"></div>
+      <div className="absolute top-6 left-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#FF3333]/20 text-[#FF3333] text-[10px] font-bold uppercase tracking-[0.25em] font-mono">
+        PREMIUM HERO VISUAL
+      </div>
+      <div className="absolute bottom-6 right-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#3B82F6]/20 text-[#E5E7EB] text-[10px] font-bold uppercase tracking-[0.2em] font-mono">
+        SLOTDATARTP.COM
+      </div>
+      <div className="relative overflow-hidden rounded-[34px] border border-neutral-800/80 bg-[#090909] shadow-[0_0_80px_rgba(255,51,51,0.12)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,51,51,0.10),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.10),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_25%)] pointer-events-none"></div>
+        <img
+          src="/hero-slotdatartp.svg"
+          alt="SlotData premium hero artwork"
+          className="relative z-[1] w-full h-auto block"
+        />
+      </div>
+    </div>
+  );
+};
+
 
 // ─── MAIN APP ──────────────────────────────────────
 function App() {
@@ -503,17 +532,26 @@ function App() {
             {heroSubtitle}<span className={`inline-block w-1.5 h-3 bg-[#FF3333] ml-0.5 ${subtitleDone ? 'animate-pulse' : ''}`}></span>
           </p>
 
-          <p className="text-neutral-400 text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+          <p className="text-neutral-400 text-base md:text-lg max-w-xl mx-auto mb-6 leading-relaxed">
             Pilih scanner yang betul untuk anda. Real-time RTP data dari 50+ provider. Scan, track, dan buat keputusan yang tepat.
           </p>
 
-          <a href="#scanners" className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-neutral-900 border border-neutral-800 hover:border-[#FF3333]/30 transition-all group pill-glow magnetic-btn">
-            <span className="px-2 py-0.5 rounded bg-[#FF3333] text-white text-[10px] font-bold uppercase">3 Live</span>
-            <span className="text-sm text-neutral-300">Pilih Scanner Anda</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF3333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
+          <div className="max-w-5xl mx-auto">
+            <HeroArtwork />
+          </div>
+
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <a href="#scanners" className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-neutral-900 border border-neutral-800 hover:border-[#FF3333]/30 transition-all group pill-glow magnetic-btn">
+              <span className="px-2 py-0.5 rounded bg-[#FF3333] text-white text-[10px] font-bold uppercase">3 Live</span>
+              <span className="text-sm text-neutral-300">Pilih Scanner Anda</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF3333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="/hero-slotdatartp.svg" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#111111]/80 border border-neutral-800 text-neutral-300 hover:text-white hover:border-[#F59E0B]/30 transition-all magnetic-btn text-sm font-semibold">
+              Open Hero Artwork
+            </a>
+          </div>
         </div>
 
 
