@@ -712,11 +712,6 @@ function App() {
 
         {/* ═══ HERO ═══ */}
         <div ref={heroReveal.ref} className={`text-center pt-24 md:pt-32 pb-16 md:pb-24 transition-all duration-1000 ${heroReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          {/* Terminal Feed */}
-          <div className="mb-10">
-            <TerminalFeed />
-          </div>
-
           {/* Lightning icon */}
           <div className="mb-6 inline-block">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#FF3333]/10 border border-[#FF3333]/20 glow-red animate-float">
