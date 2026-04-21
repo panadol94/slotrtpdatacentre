@@ -6,7 +6,7 @@ const SCANNERS = [
     id: 'cyberslot',
     name: 'CyberSlot Scanner',
     tagline: 'P2P Hacking System',
-    description: 'Hack trick tips jackpot untuk Mega888, 918Kiss, Pussy888 dan Pragmatic Play. Scanner P2P yang scan dan detect pola slot dengan teknologi hacking terkini.',
+    description: 'Hack trick tips jackpot untuk Mega888, 918Kiss, Pussy888. Scan P2P, detect pola slot guna teknologi latest. Yang ni padu untuk cari jackpot.',
     accentColor: '#FF3333',
     accentBg: 'rgba(255,51,51,0.08)',
     accentBorder: 'rgba(255,51,51,0.25)',
@@ -21,7 +21,7 @@ const SCANNERS = [
     id: 'tipsmega888',
     name: 'TipsMega888 Scanner',
     tagline: 'AI RTP + Trusted Agent',
-    description: 'Laman rujukan Mega888 Malaysia. AI RTP Scanner untuk semakan live, panduan download APK, dan halaman trusted agent sebagai bahan rujukan pengguna.',
+    description: 'Laman rujukan Mega888. AI RTP Scanner live, panduan download APK, dan trusted agent list. Simple je, semua ada kat sini.',
     accentColor: '#F59E0B',
     accentBg: 'rgba(245,158,11,0.08)',
     accentBorder: 'rgba(245,158,11,0.25)',
@@ -36,7 +36,7 @@ const SCANNERS = [
     id: 'slotpatcher',
     name: 'SlotPatcher Scanner',
     tagline: 'Live Casino Scanner',
-    description: 'Live casino scanner Malaysia. Scan provider, dapat live RTP analysis dalam beberapa saat. 16+ provider, real-time data, dan stat dashboard.',
+    description: 'Live casino scanner. Pilih provider, scan, keluar RTP analysis dalam few saat. 16+ provider, data real-time, dashboard pun ada.',
     accentColor: '#3B82F6',
     accentBg: 'rgba(59,130,246,0.08)',
     accentBorder: 'rgba(59,130,246,0.25)',
@@ -57,8 +57,8 @@ const REVIEW_BANNERS = [
     accentColor: '#FF3333',
     accentBg: 'from-[#351112] via-[#181016] to-[#10131a]',
     badge: 'CYBERSLOT PICK',
-    headline: 'Senang compare terus 3 scanner dalam satu page.',
-    quote: 'Aku suka sebab terus nampak mana satu style yang sesuai. CyberSlot rasa paling padu untuk vibe hacker, tapi semua 3 scanner jelas dan senang try.',
+    headline: 'Senang compare 3 scanner dalam satu page. Tak payah bukak banyak tab.',
+    quote: 'Aku suka sebab semua scanner ada kat sini. CyberSlot untuk hack style, TipsMega888 untuk guide, SlotPatcher untuk live scan. Senang compare, senang pilih.',
     chips: ['CyberSlot', 'TipsMega888', 'SlotPatcher'],
   },
   {
@@ -68,8 +68,8 @@ const REVIEW_BANNERS = [
     accentColor: '#F59E0B',
     accentBg: 'from-[#2c2010] via-[#151216] to-[#10131a]',
     badge: 'TIPSMEGA888 PICK',
-    headline: 'Banner ni terus bagi rasa trusted dan premium.',
-    quote: 'Bila user baru buka, terus faham TipsMega888 untuk panduan, CyberSlot untuk bot style, dan SlotPatcher untuk live scan. Conversion memang lagi sedap.',
+    headline: 'Banner ni bagi rasa trusted. User baru terus rasa selamat.',
+    quote: 'Bila user baru buka, terus faham — TipsMega888 untuk guide, CyberSlot untuk bot, SlotPatcher untuk live scan. Conversion naik sebab user tak confused.',
     chips: ['Trusted vibe', 'Clean compare', 'Beginner friendly'],
   },
   {
@@ -79,8 +79,8 @@ const REVIEW_BANNERS = [
     accentColor: '#3B82F6',
     accentBg: 'from-[#101829] via-[#13131a] to-[#0e1116]',
     badge: 'SLOTPATCHER PICK',
-    headline: 'Carousel macam ni buat orang rasa nak swipe dan cuba.',
-    quote: 'Setiap slide boleh push angle berbeza. Satu untuk trust, satu untuk live scan, satu untuk bot. User tak bosan dan terus rasa nak klik CTA.',
+    headline: 'Carousel ni buat orang rasa nak swipe dan try. Interactive sikit.',
+    quote: 'Setiap slide push angle lain. Satu untuk trust, satu untuk live scan, satu untuk bot. User tak bosan, terus rasa nak klik.',
     chips: ['Animated', 'Premium', 'High intent'],
   },
   {
@@ -90,8 +90,8 @@ const REVIEW_BANNERS = [
     accentColor: '#E879F9',
     accentBg: 'from-[#281126] via-[#151116] to-[#11131a]',
     badge: 'REVIEW MODE',
-    headline: 'Rasa macam banner promo brand besar, bukan landing biasa.',
-    quote: 'Kalau rotate beberapa banner macam ni, user rasa page aktif dan ada banyak angle review. Lagi senang push depa try semua 3 scanner sekali.',
+    headline: 'Rasa macam brand besar, bukan landing page biasa.',
+    quote: 'Rotate beberapa banner macam ni, page rasa aktif. Lagi senang push user try semua 3 scanner sekali gus.',
     chips: ['Carousel motion', 'Visual trust', 'CTA ready'],
   },
 ];
@@ -737,7 +737,7 @@ function App() {
           </p>
 
           <p className="text-neutral-400 text-base md:text-lg max-w-xl mx-auto mb-6 leading-relaxed">
-            Pilih scanner yang betul untuk anda. Real-time RTP data dari 50+ provider. Scan, track, dan buat keputusan yang tepat.
+            Pilih scanner yang sesuai untuk kau. Real-time RTP data dari 50+ provider. Scan, track, dan decide dengan betul.
           </p>
 
           <div className="max-w-6xl mx-auto">
@@ -763,7 +763,7 @@ function App() {
         <div id="scanners" className="scroll-mt-20 pb-16 md:pb-24">
           <div className="text-center mb-10">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 glitch-text" data-text="⟩ Pilih Scanner">⟩ Pilih Scanner</h2>
-            <p className="text-neutral-500 text-sm">3 scanner berbeza, setiap satu unik untuk keperluan anda.</p>
+            <p className="text-neutral-500 text-sm">3 scanner berbeza, pilih yang kau nak.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
@@ -799,7 +799,7 @@ function App() {
                 </svg>
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2 glitch-text" data-text="Join Telegram">Join Telegram</h2>
-              <p className="text-neutral-500 text-sm mb-6 max-w-sm mx-auto">Real-time alerts, new providers, dan update scanner terkini.</p>
+              <p className="text-neutral-500 text-sm mb-6 max-w-sm mx-auto">Alert real-time, provider baru, dan update scanner latest.</p>
               <a
                 href="https://t.me/slotdatartp"
                 target="_blank"
