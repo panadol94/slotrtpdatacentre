@@ -49,6 +49,53 @@ const SCANNERS = [
   },
 ];
 
+const REVIEW_BANNERS = [
+  {
+    id: 'alya',
+    name: 'Alya',
+    role: 'Mobile user review',
+    accentColor: '#FF3333',
+    accentBg: 'from-[#351112] via-[#181016] to-[#10131a]',
+    badge: 'CYBERSLOT PICK',
+    headline: 'Senang compare terus 3 scanner dalam satu page.',
+    quote: 'Aku suka sebab terus nampak mana satu style yang sesuai. CyberSlot rasa paling padu untuk vibe hacker, tapi semua 3 scanner jelas dan senang try.',
+    chips: ['CyberSlot', 'TipsMega888', 'SlotPatcher'],
+  },
+  {
+    id: 'nabila',
+    name: 'Nabila',
+    role: 'Guide-style review',
+    accentColor: '#F59E0B',
+    accentBg: 'from-[#2c2010] via-[#151216] to-[#10131a]',
+    badge: 'TIPSMEGA888 PICK',
+    headline: 'Banner ni terus bagi rasa trusted dan premium.',
+    quote: 'Bila user baru buka, terus faham TipsMega888 untuk panduan, CyberSlot untuk bot style, dan SlotPatcher untuk live scan. Conversion memang lagi sedap.',
+    chips: ['Trusted vibe', 'Clean compare', 'Beginner friendly'],
+  },
+  {
+    id: 'sofia',
+    name: 'Sofia',
+    role: 'Live scan review',
+    accentColor: '#3B82F6',
+    accentBg: 'from-[#101829] via-[#13131a] to-[#0e1116]',
+    badge: 'SLOTPATCHER PICK',
+    headline: 'Carousel macam ni buat orang rasa nak swipe dan cuba.',
+    quote: 'Setiap slide boleh push angle berbeza. Satu untuk trust, satu untuk live scan, satu untuk bot. User tak bosan dan terus rasa nak klik CTA.',
+    chips: ['Animated', 'Premium', 'High intent'],
+  },
+  {
+    id: 'amira',
+    name: 'Amira',
+    role: 'Conversion-style review',
+    accentColor: '#E879F9',
+    accentBg: 'from-[#281126] via-[#151116] to-[#11131a]',
+    badge: 'REVIEW MODE',
+    headline: 'Rasa macam banner promo brand besar, bukan landing biasa.',
+    quote: 'Kalau rotate beberapa banner macam ni, user rasa page aktif dan ada banyak angle review. Lagi senang push depa try semua 3 scanner sekali.',
+    chips: ['Carousel motion', 'Visual trust', 'CTA ready'],
+  },
+];
+
 // ─── HOOKS ──────────────────────────────────────────
 
 /* Typing animation */
@@ -418,30 +465,134 @@ const StatCard: React.FC<{ label: string; target: number; suffix: string }> = ({
   );
 };
 
-const HeroArtwork: React.FC = () => {
-  const tiltRef = useTilt<HTMLDivElement>(8);
+const ReviewAvatar: React.FC<{ name: string; accentColor: string; active: boolean }> = ({ name, accentColor, active }) => {
+  return (
+    <div className="relative w-[180px] h-[220px] sm:w-[220px] sm:h-[270px] shrink-0">
+      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-b from-white/10 to-white/0 border border-white/10 backdrop-blur-sm"></div>
+      <div className="absolute -inset-3 rounded-[36px] blur-2xl opacity-30" style={{ background: `${accentColor}33` }}></div>
+      <svg viewBox="0 0 220 270" className={`relative w-full h-full transition-transform duration-700 ${active ? 'scale-100' : 'scale-95 opacity-80'}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id={`card-${name}`} x1="0" y1="0" x2="220" y2="270" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#17181D" />
+            <stop offset="1" stopColor="#0D1016" />
+          </linearGradient>
+        </defs>
+        <rect x="12" y="12" width="196" height="246" rx="28" fill={`url(#card-${name})`} stroke="rgba(255,255,255,0.08)" />
+        <circle cx="110" cy="86" r="48" fill="#F0C7A5" />
+        <path d="M62 82C65 40 93 26 111 26C136 26 158 42 160 80C147 66 133 60 111 60C91 60 77 67 62 82Z" fill="#111318" />
+        <path d="M62 204C69 160 87 134 110 134C133 134 151 160 158 204V226H62V204Z" fill={accentColor} opacity="0.95" />
+        <path d="M79 82C84 73 94 66 110 66C127 66 137 73 141 82" stroke="#1A1C20" strokeWidth="8" strokeLinecap="round" />
+        <circle cx="92" cy="92" r="4" fill="#1A1C20" />
+        <circle cx="128" cy="92" r="4" fill="#1A1C20" />
+        <path d="M96 111C103 117 117 117 124 111" stroke="#AB6B63" strokeWidth="4" strokeLinecap="round" />
+        <rect x="40" y="188" width="140" height="22" rx="11" fill="rgba(255,255,255,0.08)" />
+        <text x="110" y="203" textAnchor="middle" fill="#FFFFFF" fontFamily="Inter, sans-serif" fontSize="12" fontWeight="700">{name.toUpperCase()}</text>
+      </svg>
+    </div>
+  );
+};
+
+const HeroCarousel: React.FC = () => {
+  const [active, setActive] = useState(0);
+  const tiltRef = useTilt<HTMLDivElement>(6);
   const reveal = useScrollReveal<HTMLDivElement>();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActive((prev) => (prev + 1) % REVIEW_BANNERS.length);
+    }, 4800);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div
       ref={(el) => { (tiltRef as React.MutableRefObject<HTMLDivElement | null>).current = el; (reveal.ref as React.MutableRefObject<HTMLDivElement | null>).current = el; }}
       className={`relative mt-10 mb-10 transition-all duration-700 ${reveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
     >
-      <div className="absolute -inset-6 bg-gradient-to-r from-[#FF3333]/12 via-[#F59E0B]/10 to-[#3B82F6]/12 blur-3xl rounded-[40px] pointer-events-none"></div>
-      <div className="absolute inset-0 rounded-[34px] border border-white/5 pointer-events-none"></div>
-      <div className="absolute top-6 left-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#FF3333]/20 text-[#FF3333] text-[10px] font-bold uppercase tracking-[0.25em] font-mono">
-        PREMIUM HERO VISUAL
-      </div>
-      <div className="absolute bottom-6 right-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-[#3B82F6]/20 text-[#E5E7EB] text-[10px] font-bold uppercase tracking-[0.2em] font-mono">
-        SLOTDATARTP.COM
-      </div>
-      <div className="relative overflow-hidden rounded-[34px] border border-neutral-800/80 bg-[#090909] shadow-[0_0_80px_rgba(255,51,51,0.12)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,51,51,0.10),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.10),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_25%)] pointer-events-none"></div>
-        <img
-          src="/hero-slotdatartp.svg"
-          alt="SlotData premium hero artwork"
-          className="relative z-[1] w-full h-auto block"
-        />
+      <div className="absolute -inset-6 bg-gradient-to-r from-[#FF3333]/14 via-[#F59E0B]/12 to-[#3B82F6]/14 blur-3xl rounded-[42px] pointer-events-none"></div>
+      <div className="relative overflow-hidden rounded-[34px] border border-neutral-800/80 bg-[#090909] shadow-[0_0_80px_rgba(255,51,51,0.12)] min-h-[420px] md:min-h-[460px]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,51,51,0.12),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_22%)] pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:42px_42px]"></div>
+        <div className="absolute top-6 left-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold uppercase tracking-[0.25em] font-mono">
+          REVIEW CAROUSEL
+        </div>
+        <div className="absolute top-6 right-6 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[#E5E7EB] text-[10px] font-bold uppercase tracking-[0.2em] font-mono">
+          AUTO ROTATE
+        </div>
+
+        <div className="relative z-[1] p-6 sm:p-8 md:p-10">
+          <div className="relative min-h-[360px] md:min-h-[390px]">
+            {REVIEW_BANNERS.map((banner, index) => {
+              const isActive = active === index;
+              return (
+                <div
+                  key={banner.id}
+                  className={`absolute inset-0 transition-all duration-700 ${isActive ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-8 pointer-events-none'}`}
+                >
+                  <div className={`h-full rounded-[28px] border border-white/10 bg-gradient-to-br ${banner.accentBg} p-5 sm:p-7 md:p-8 flex flex-col lg:flex-row gap-6 items-center lg:items-stretch overflow-hidden`}>
+                    <div className="absolute inset-y-0 left-0 w-1.5 rounded-r-full" style={{ background: banner.accentColor }}></div>
+                    <div className="flex items-center justify-center lg:justify-start lg:pl-3 pt-2 lg:pt-0">
+                      <ReviewAvatar name={banner.name} accentColor={banner.accentColor} active={isActive} />
+                    </div>
+
+                    <div className="flex-1 flex flex-col justify-center text-center lg:text-left">
+                      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-4">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.22em] border" style={{ color: banner.accentColor, borderColor: `${banner.accentColor}66`, background: `${banner.accentColor}14` }}>
+                          {banner.badge}
+                        </span>
+                        <span className="text-neutral-400 text-[11px] font-mono uppercase tracking-[0.18em]">{banner.role}</span>
+                      </div>
+
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight mb-3 max-w-3xl">
+                        {banner.headline}
+                      </h3>
+
+                      <p className="text-neutral-300 text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mb-5">
+                        “{banner.quote}”
+                      </p>
+
+                      <div className="flex items-center justify-center lg:justify-start gap-3 mb-5">
+                        <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-black text-sm border border-white/10" style={{ background: `${banner.accentColor}22` }}>
+                          {banner.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="text-white font-bold text-base">{banner.name}</div>
+                          <div className="text-neutral-500 text-xs uppercase tracking-[0.2em]">Community review style</div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                        {banner.chips.map((chip) => (
+                          <span key={chip} className="px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-neutral-200 text-xs font-semibold">
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="relative z-[2] mt-6 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              {REVIEW_BANNERS.map((banner, index) => (
+                <button
+                  key={banner.id}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${active === index ? 'w-10' : 'w-2.5 bg-white/20'}`}
+                  style={active === index ? { background: banner.accentColor } : undefined}
+                  aria-label={`Open banner ${index + 1}`}
+                />
+              ))}
+            </div>
+            <div className="text-neutral-500 text-xs font-mono uppercase tracking-[0.18em]">
+              Swipe vibe · premium review mode · auto-rotate
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -536,8 +687,8 @@ function App() {
             Pilih scanner yang betul untuk anda. Real-time RTP data dari 50+ provider. Scan, track, dan buat keputusan yang tepat.
           </p>
 
-          <div className="max-w-5xl mx-auto">
-            <HeroArtwork />
+          <div className="max-w-6xl mx-auto">
+            <HeroCarousel />
           </div>
 
           <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -548,8 +699,8 @@ function App() {
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
             </a>
-            <a href="/hero-slotdatartp.svg" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#111111]/80 border border-neutral-800 text-neutral-300 hover:text-white hover:border-[#F59E0B]/30 transition-all magnetic-btn text-sm font-semibold">
-              Open Hero Artwork
+            <a href="https://t.me/Cyberslotscannerplusbot?start=5925622731" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#111111]/80 border border-neutral-800 text-neutral-300 hover:text-white hover:border-[#F59E0B]/30 transition-all magnetic-btn text-sm font-semibold">
+              Cuba Scanner Sekarang
             </a>
           </div>
         </div>
