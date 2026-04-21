@@ -466,28 +466,81 @@ const StatCard: React.FC<{ label: string; target: number; suffix: string }> = ({
 };
 
 const ReviewAvatar: React.FC<{ name: string; accentColor: string; active: boolean }> = ({ name, accentColor, active }) => {
+  const initials = name.charAt(0);
+  // Generate deterministic hue/saturation from name hash
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const hue = Math.abs(hash) % 360;
+  const s1 = 45 + (Math.abs(hash >> 3) % 20);
+  const s2 = 55 + (Math.abs(hash >> 5) % 15);
+  const l1 = 60 + (Math.abs(hash >> 7) % 15);
+  const l2 = 35 + (Math.abs(hash >> 9) % 15);
+
   return (
-    <div className="relative w-[180px] h-[220px] sm:w-[220px] sm:h-[270px] shrink-0">
-      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-b from-white/10 to-white/0 border border-white/10 backdrop-blur-sm"></div>
-      <div className="absolute -inset-3 rounded-[36px] blur-2xl opacity-30" style={{ background: `${accentColor}33` }}></div>
-      <svg viewBox="0 0 220 270" className={`relative w-full h-full transition-transform duration-700 ${active ? 'scale-100' : 'scale-95 opacity-80'}`} fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id={`card-${name}`} x1="0" y1="0" x2="220" y2="270" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#17181D" />
-            <stop offset="1" stopColor="#0D1016" />
-          </linearGradient>
-        </defs>
-        <rect x="12" y="12" width="196" height="246" rx="28" fill={`url(#card-${name})`} stroke="rgba(255,255,255,0.08)" />
-        <circle cx="110" cy="86" r="48" fill="#F0C7A5" />
-        <path d="M62 82C65 40 93 26 111 26C136 26 158 42 160 80C147 66 133 60 111 60C91 60 77 67 62 82Z" fill="#111318" />
-        <path d="M62 204C69 160 87 134 110 134C133 134 151 160 158 204V226H62V204Z" fill={accentColor} opacity="0.95" />
-        <path d="M79 82C84 73 94 66 110 66C127 66 137 73 141 82" stroke="#1A1C20" strokeWidth="8" strokeLinecap="round" />
-        <circle cx="92" cy="92" r="4" fill="#1A1C20" />
-        <circle cx="128" cy="92" r="4" fill="#1A1C20" />
-        <path d="M96 111C103 117 117 117 124 111" stroke="#AB6B63" strokeWidth="4" strokeLinecap="round" />
-        <rect x="40" y="188" width="140" height="22" rx="11" fill="rgba(255,255,255,0.08)" />
-        <text x="110" y="203" textAnchor="middle" fill="#FFFFFF" fontFamily="Inter, sans-serif" fontSize="12" fontWeight="700">{name.toUpperCase()}</text>
-      </svg>
+    <div className={`relative w-[180px] h-[220px] sm:w-[220px] sm:h-[270px] shrink-0 transition-all duration-700 ${active ? 'scale-100 opacity-100' : 'scale-95 opacity-80'}`}>
+      <div className="absolute -inset-2 rounded-[34px] blur-xl opacity-40" style={{ background: `radial-gradient(circle at 50% 30%, ${accentColor}44, transparent 60%)` }}></div>
+      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.10] backdrop-blur-sm"></div>
+      <div className="relative w-full h-full flex flex-col items-center justify-center p-5">
+        <div className="relative mb-4">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+            <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id={`skin-${name}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={`hsl(${hue}, ${s1}%, ${l1}%)`} />
+                  <stop offset="100%" stopColor={`hsl(${hue}, ${s2}%, ${l2}%)`} />
+                </linearGradient>
+                <radialGradient id={`shadow-${name}`} cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%" stopColor="#000" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#000" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+
+              <rect width="200" height="200" fill={`url(#skin-${name})`} />
+
+              {/* Hair */}
+              <path d="M40 90C40 50 60 20 100 20C140 20 160 50 160 90C160 110 150 120 140 115C130 110 120 100 100 100C80 100 70 110 60 115C50 120 40 110 40 90Z"
+                fill={`hsl(${(hue + 30) % 360}, ${s1 + 15}%, ${Math.max(l2 - 15, 15)}%)`} opacity="0.9" />
+
+              {/* Face shape */}
+              <ellipse cx="100" cy="115" rx="48" ry="58" fill={`url(#skin-${name})`} />
+
+              {/* Eyes */}
+              <ellipse cx="82" cy="108" rx="6" ry="5" fill="#1a1a1a" />
+              <ellipse cx="118" cy="108" rx="6" ry="5" fill="#1a1a1a" />
+              <circle cx="83" cy="107" r="2" fill="white" opacity="0.7" />
+              <circle cx="119" cy="107" r="2" fill="white" opacity="0.7" />
+
+              {/* Eyebrows */}
+              <path d="M72 100Q82 95 92 100" stroke={`hsl(${(hue + 30) % 360}, ${s1 + 5}%, 25%)`} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <path d="M108 100Q118 95 128 100" stroke={`hsl(${(hue + 30) % 360}, ${s1 + 5}%, 25%)`} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+              {/* Nose */}
+              <path d="M100 115L96 128L104 128Z" fill="#000" opacity="0.1" />
+
+              {/* Lips */}
+              <path d="M88 138Q100 143 112 138" stroke={`hsl(${hue}, ${s1 + 10}%, ${l2 - 5}%)`} strokeWidth="3" strokeLinecap="round" fill="none" />
+              <path d="M88 138Q100 135 112 138" stroke={`hsl(${hue}, ${s1 + 5}%, ${l2 + 5}%)`} strokeWidth="2" strokeLinecap="round" fill="none" />
+
+              {/* Neck shadow */}
+              <ellipse cx="100" cy="165" rx="30" ry="12" fill="url(#shadow-${name})" />
+
+              {/* Clothing suggestion */}
+              <path d="M50 170Q100 155 150 170V200H50V170Z" fill={`hsl(${(hue + 180) % 360}, ${s1 - 10}%, 15%)`} opacity="0.6" />
+
+              {/* Subtle light from top */}
+              <ellipse cx="100" cy="60" rx="60" ry="40" fill="white" opacity="0.04" />
+            </svg>
+          </div>
+          <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-white/10 shadow-lg"
+            style={{ background: accentColor }}>
+            {initials}
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="text-white font-bold text-sm mb-0.5">{name}</div>
+          <div className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] font-mono">Verified User</div>
+        </div>
+      </div>
     </div>
   );
 };
