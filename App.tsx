@@ -438,9 +438,28 @@ const ScannerCard: React.FC<{ scanner: typeof SCANNERS[0]; index: number }> = ({
         <div className="holo-border" style={{ '--holo-color': scanner.accentColor } as React.CSSProperties}></div>
       </div>
 
-      {/* Scan line sweep */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="scan-line-sweep" style={{ background: `linear-gradient(180deg, transparent, ${scanner.accentColor}20, transparent)` }}></div>
+      {/* Scanner grid overlay (fades in on hover) */}
+      <div
+        className="scanner-grid-overlay rounded-3xl"
+        style={{ ['--scan-grid-color' as string]: `${scanner.accentColor}22` } as React.CSSProperties}
+      ></div>
+
+      {/* Scan line sweep (one-shot activation on hover) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-3xl">
+        <div
+          className="scan-line-sweep"
+          style={{
+            background: `linear-gradient(180deg, transparent 0%, ${scanner.accentColor}18 42%, ${scanner.accentColor}cc 50%, ${scanner.accentColor}18 58%, transparent 100%)`,
+            boxShadow: `0 0 28px 2px ${scanner.accentColor}55`,
+          }}
+        ></div>
+      </div>
+
+      {/* Scanning indicator badge (top-right, appears on hover) */}
+      <div className="scanning-indicator absolute top-3 right-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm border text-[9px] font-mono font-bold uppercase tracking-[0.18em]"
+        style={{ borderColor: `${scanner.accentColor}55`, color: scanner.accentColor }}>
+        <span className="scan-dot inline-block w-1.5 h-1.5 rounded-full" style={{ background: scanner.accentColor }}></span>
+        Scanning
       </div>
 
       {/* Top glow line */}

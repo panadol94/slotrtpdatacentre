@@ -168,21 +168,60 @@
         to { --holo-angle: 360deg; }
       }
 
-      /* ── SCAN LINE SWEEP ── */
+      /* ── SCAN LINE SWEEP (on-hover activation scan) ── */
       .scan-line-sweep {
         position: absolute;
         left: 0;
         right: 0;
-        height: 60px;
-        animation: sweep 3s ease-in-out infinite;
+        height: 90px;
+        top: -90px;
         opacity: 0;
+        pointer-events: none;
       }
       .group:hover .scan-line-sweep {
-        opacity: 1;
+        animation: sweep 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
       }
       @keyframes sweep {
-        0% { top: -60px; }
-        100% { top: 100%; }
+        0%   { top: -90px; opacity: 0; }
+        12%  { opacity: 1; }
+        88%  { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+      }
+
+      /* ── SCANNER GRID OVERLAY (fades in while hovering) ── */
+      .scanner-grid-overlay {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 350ms ease-out;
+        background-image:
+          linear-gradient(var(--scan-grid-color, rgba(255,255,255,0.08)) 1px, transparent 1px),
+          linear-gradient(90deg, var(--scan-grid-color, rgba(255,255,255,0.08)) 1px, transparent 1px);
+        background-size: 22px 22px;
+        mask-image: radial-gradient(circle at 50% 40%, black 20%, transparent 75%);
+        -webkit-mask-image: radial-gradient(circle at 50% 40%, black 20%, transparent 75%);
+      }
+      .group:hover .scanner-grid-overlay {
+        opacity: 0.9;
+      }
+
+      /* ── SCANNING INDICATOR BADGE ── */
+      .scanning-indicator {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 220ms ease-out, transform 220ms ease-out;
+      }
+      .group:hover .scanning-indicator {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .scanning-indicator .scan-dot {
+        animation: scan-dot-pulse 900ms ease-in-out infinite;
+      }
+      @keyframes scan-dot-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%      { opacity: 0.3; transform: scale(1.4); }
       }
 
       /* ── SCAN LINE SLOW (CTA section) ── */
