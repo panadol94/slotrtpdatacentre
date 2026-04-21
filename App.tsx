@@ -156,14 +156,20 @@ function useScrollReveal<T extends HTMLElement>() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Fallback: force-show after 700ms so headless renderers / slow observers never leave content hidden
+    const fallback = setTimeout(() => setVisible(true), 700);
     const obs = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setVisible(true);
         obs.disconnect();
+        clearTimeout(fallback);
       }
     }, { threshold: 0.1 });
     obs.observe(el);
-    return () => obs.disconnect();
+    return () => {
+      obs.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
   return { ref, visible };
 }
@@ -321,6 +327,52 @@ const TerminalFeed: React.FC = () => {
             <span className="inline-block w-2 h-3 bg-[#FF3333] animate-pulse"></span>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+
+// ─── COUNTDOWN TIMER ───────────────────────────────
+// Rolling 24h countdown — resets at local midnight, drives urgency CTA
+const CountdownTimer: React.FC<{ accentColor?: string }> = ({ accentColor = '#FF3333' }) => {
+  const [remaining, setRemaining] = useState(() => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    return midnight.getTime() - now.getTime();
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      setRemaining(midnight.getTime() - now.getTime());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const totalSec = Math.max(0, Math.floor(remaining / 1000));
+  const hh = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+  const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+  const ss = String(totalSec % 60).padStart(2, '0');
+
+  const segStyle = {
+    borderColor: `${accentColor}33`,
+    background: `${accentColor}14`,
+    color: accentColor,
+  } as React.CSSProperties;
+
+  return (
+    <div className="inline-flex items-center gap-2 font-mono">
+      <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">Free trial ends in</span>
+      <div className="flex items-center gap-1">
+        <span className="px-2 py-1 rounded-md border text-sm font-bold tabular-nums" style={segStyle}>{hh}</span>
+        <span className="text-neutral-600">:</span>
+        <span className="px-2 py-1 rounded-md border text-sm font-bold tabular-nums" style={segStyle}>{mm}</span>
+        <span className="text-neutral-600">:</span>
+        <span className="px-2 py-1 rounded-md border text-sm font-bold tabular-nums" style={segStyle}>{ss}</span>
       </div>
     </div>
   );
@@ -735,6 +787,10 @@ function App() {
             Pilih scanner yang sesuai untuk kau. Real-time RTP data dari 50+ provider. Scan, track, dan decide dengan betul.
           </p>
 
+          <div className="mb-8">
+            <TerminalFeed />
+          </div>
+
           <div className="max-w-6xl mx-auto">
             <HeroCarousel />
           </div>
@@ -794,7 +850,10 @@ function App() {
                 </svg>
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2 glitch-text" data-text="Join Telegram">Join Telegram</h2>
-              <p className="text-neutral-500 text-sm mb-6 max-w-sm mx-auto">Alert real-time, provider baru, dan update scanner latest.</p>
+              <p className="text-neutral-500 text-sm mb-5 max-w-sm mx-auto">Alert real-time, provider baru, dan update scanner latest.</p>
+              <div className="mb-6 flex justify-center">
+                <CountdownTimer accentColor="#FF3333" />
+              </div>
               <a
                 href="https://t.me/slotdatartp"
                 target="_blank"
