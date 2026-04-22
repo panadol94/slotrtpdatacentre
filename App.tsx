@@ -806,10 +806,6 @@ function App() {
             Pilih scanner yang sesuai untuk kau. Real-time RTP data dari 50+ provider. Scan, track, dan decide dengan betul.
           </p>
 
-          <div className="mb-8">
-            <TerminalFeed />
-          </div>
-
           <div className="max-w-6xl mx-auto">
             <HeroCarousel />
           </div>
