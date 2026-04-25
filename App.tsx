@@ -53,6 +53,7 @@ const REVIEW_BANNERS = [
   {
     id: 'alya',
     name: 'Alya',
+    image: '/review-alya-melayu.webp',
     role: 'Mobile user review',
     accentColor: '#FF3333',
     accentBg: 'from-[#351112] via-[#181016] to-[#10131a]',
@@ -64,6 +65,7 @@ const REVIEW_BANNERS = [
   {
     id: 'nabila',
     name: 'Nabila',
+    image: '/review-nabila-melayu.webp',
     role: 'Guide-style review',
     accentColor: '#F59E0B',
     accentBg: 'from-[#2c2010] via-[#151216] to-[#10131a]',
@@ -75,6 +77,7 @@ const REVIEW_BANNERS = [
   {
     id: 'sofia',
     name: 'Sofia',
+    image: '/review-sofia-melayu.webp',
     role: 'Live scan review',
     accentColor: '#3B82F6',
     accentBg: 'from-[#101829] via-[#13131a] to-[#0e1116]',
@@ -457,80 +460,31 @@ const StatCard: React.FC<{ label: string; target: number; suffix: string }> = ({
   );
 };
 
-const ReviewAvatar: React.FC<{ name: string; accentColor: string; active: boolean }> = ({ name, accentColor, active }) => {
+const ReviewAvatar: React.FC<{ name: string; image: string; accentColor: string; active: boolean }> = ({ name, image, accentColor, active }) => {
   const initials = name.charAt(0);
-  // Generate deterministic hue/saturation from name hash
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  const hue = Math.abs(hash) % 360;
-  const s1 = 45 + (Math.abs(hash >> 3) % 20);
-  const s2 = 55 + (Math.abs(hash >> 5) % 15);
-  const l1 = 60 + (Math.abs(hash >> 7) % 15);
-  const l2 = 35 + (Math.abs(hash >> 9) % 15);
 
   return (
-    <div className={`relative w-[180px] h-[220px] sm:w-[220px] sm:h-[270px] shrink-0 transition-all duration-700 ${active ? 'scale-100 opacity-100' : 'scale-95 opacity-80'}`}>
+    <div className={`group relative w-[180px] h-[220px] sm:w-[220px] sm:h-[270px] shrink-0 transition-all duration-700 ${active ? 'scale-100 opacity-100' : 'scale-95 opacity-80'}`}>
       <div className="absolute -inset-2 rounded-[34px] blur-xl opacity-40" style={{ background: `radial-gradient(circle at 50% 30%, ${accentColor}44, transparent 60%)` }}></div>
-      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/[0.10] backdrop-blur-sm"></div>
-      <div className="relative w-full h-full flex flex-col items-center justify-center p-5">
-        <div className="relative mb-4">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
-            <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id={`skin-${name}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={`hsl(${hue}, ${s1}%, ${l1}%)`} />
-                  <stop offset="100%" stopColor={`hsl(${hue}, ${s2}%, ${l2}%)`} />
-                </linearGradient>
-                <radialGradient id={`shadow-${name}`} cx="0.5" cy="0.5" r="0.5">
-                  <stop offset="0%" stopColor="#000" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#000" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-
-              <rect width="200" height="200" fill={`url(#skin-${name})`} />
-
-              {/* Hair */}
-              <path d="M40 90C40 50 60 20 100 20C140 20 160 50 160 90C160 110 150 120 140 115C130 110 120 100 100 100C80 100 70 110 60 115C50 120 40 110 40 90Z"
-                fill={`hsl(${(hue + 30) % 360}, ${s1 + 15}%, ${Math.max(l2 - 15, 15)}%)`} opacity="0.9" />
-
-              {/* Face shape */}
-              <ellipse cx="100" cy="115" rx="48" ry="58" fill={`url(#skin-${name})`} />
-
-              {/* Eyes */}
-              <ellipse cx="82" cy="108" rx="6" ry="5" fill="#1a1a1a" />
-              <ellipse cx="118" cy="108" rx="6" ry="5" fill="#1a1a1a" />
-              <circle cx="83" cy="107" r="2" fill="white" opacity="0.7" />
-              <circle cx="119" cy="107" r="2" fill="white" opacity="0.7" />
-
-              {/* Eyebrows */}
-              <path d="M72 100Q82 95 92 100" stroke={`hsl(${(hue + 30) % 360}, ${s1 + 5}%, 25%)`} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-              <path d="M108 100Q118 95 128 100" stroke={`hsl(${(hue + 30) % 360}, ${s1 + 5}%, 25%)`} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-
-              {/* Nose */}
-              <path d="M100 115L96 128L104 128Z" fill="#000" opacity="0.1" />
-
-              {/* Lips */}
-              <path d="M88 138Q100 143 112 138" stroke={`hsl(${hue}, ${s1 + 10}%, ${l2 - 5}%)`} strokeWidth="3" strokeLinecap="round" fill="none" />
-              <path d="M88 138Q100 135 112 138" stroke={`hsl(${hue}, ${s1 + 5}%, ${l2 + 5}%)`} strokeWidth="2" strokeLinecap="round" fill="none" />
-
-              {/* Neck shadow */}
-              <ellipse cx="100" cy="165" rx="30" ry="12" fill="url(#shadow-${name})" />
-
-              {/* Clothing suggestion */}
-              <path d="M50 170Q100 155 150 170V200H50V170Z" fill={`hsl(${(hue + 180) % 360}, ${s1 - 10}%, 15%)`} opacity="0.6" />
-
-              {/* Subtle light from top */}
-              <ellipse cx="100" cy="60" rx="60" ry="40" fill="white" opacity="0.04" />
-            </svg>
-          </div>
+      <div className="absolute inset-0 rounded-[30px] bg-gradient-to-b from-white/[0.10] to-white/[0.03] border border-white/[0.12] backdrop-blur-sm"></div>
+      <div className="relative w-full h-full overflow-hidden rounded-[30px] p-3">
+        <div className="relative h-full overflow-hidden rounded-[24px] border border-white/10 shadow-[0_0_24px_rgba(255,255,255,0.06)] bg-black">
+          <img
+            src={image}
+            alt={`${name} verified Malay reviewer`}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent"></div>
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(circle at 50% 20%, ${accentColor}22, transparent 58%)` }}></div>
           <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs border border-white/10 shadow-lg"
             style={{ background: accentColor }}>
             {initials}
           </div>
-        </div>
-        <div className="text-center">
-          <div className="text-white font-bold text-sm mb-0.5">{name}</div>
-          <div className="text-[10px] text-neutral-500 uppercase tracking-[0.2em] font-mono">Verified User</div>
+          <div className="absolute inset-x-0 bottom-0 p-4 text-center">
+            <div className="text-white font-bold text-sm mb-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">{name}</div>
+            <div className="text-[10px] text-neutral-300 uppercase tracking-[0.2em] font-mono">Verified User</div>
+          </div>
         </div>
       </div>
     </div>
@@ -577,7 +531,7 @@ const HeroCarousel: React.FC = () => {
                   <div className={`h-full rounded-[28px] border border-white/10 bg-gradient-to-br ${banner.accentBg} p-5 sm:p-7 md:p-8 flex flex-col lg:flex-row gap-6 items-center lg:items-stretch overflow-hidden`}>
                     <div className="absolute inset-y-0 left-0 w-1.5 rounded-r-full" style={{ background: banner.accentColor }}></div>
                     <div className="flex items-center justify-center lg:justify-start lg:pl-3 pt-2 lg:pt-0">
-                      <ReviewAvatar name={banner.name} accentColor={banner.accentColor} active={isActive} />
+                      <ReviewAvatar name={banner.name} image={banner.image} accentColor={banner.accentColor} active={isActive} />
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center text-center lg:text-left">
