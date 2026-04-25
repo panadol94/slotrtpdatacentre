@@ -643,6 +643,48 @@ const HeroCarousel: React.FC = () => {
   );
 };
 
+const PremiumHeroVisual: React.FC = () => {
+  const tiltRef = useTilt<HTMLDivElement>(4);
+  const reveal = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <div
+      ref={(el) => { (tiltRef as React.MutableRefObject<HTMLDivElement | null>).current = el; (reveal.ref as React.MutableRefObject<HTMLDivElement | null>).current = el; }}
+      className={`relative mt-8 mb-10 transition-all duration-700 ${reveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+    >
+      <div className="absolute -inset-5 rounded-[38px] bg-gradient-to-r from-[#FF3333]/25 via-[#F59E0B]/20 to-[#3B82F6]/25 blur-3xl opacity-80 pointer-events-none"></div>
+      <div className="relative overflow-hidden rounded-[30px] md:rounded-[38px] border border-white/10 bg-[#060606] shadow-[0_0_110px_rgba(255,51,51,0.18)]">
+        <img
+          src="/slotdatartp-premium-hero.webp"
+          alt="SlotData premium RTP scanner visual"
+          className="w-full aspect-[16/10] md:aspect-[16/8] object-cover scale-[1.02]"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/5"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.16),transparent_34%)]"></div>
+        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 md:p-9 text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-[0.22em] text-[#FDE68A] mb-3">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F59E0B] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F59E0B]"></span>
+            </span>
+            Premium RTP Hub
+          </div>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight max-w-3xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)]">
+            Masuk terus rasa macam pusat scanner casino premium.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm sm:text-base text-neutral-200 leading-relaxed drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)]">
+            Visual baru bagi first impression lebih kuat — gold jackpot vibe, neon scanner data, dan rasa high-value sebelum visitor pilih scanner.
+          </p>
+        </div>
+        <div className="absolute top-4 right-4 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
+          Live Analysis · 50+ Provider
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 // ─── MAIN APP ──────────────────────────────────────
 function App() {
@@ -726,6 +768,8 @@ function App() {
           <p className="text-neutral-400 text-base md:text-lg max-w-xl mx-auto mb-6 leading-relaxed">
             Pilih scanner yang sesuai untuk kau. Real-time RTP data dari 50+ provider. Scan, track, dan decide dengan betul.
           </p>
+
+          <PremiumHeroVisual />
 
           <div className="max-w-6xl mx-auto">
             <HeroCarousel />
